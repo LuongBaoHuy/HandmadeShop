@@ -538,29 +538,44 @@ Orders (
 *Modern and responsive homepage with featured products and categories*
 
 #### Product Listing
-![Product Listing](wwwroot/images/screenshots/products.png)
+![Product Listing](HandmadeShop/wwwroot/images/screenshots/products.png)
 *Advanced filtering and sorting options for easy product discovery*
 
 #### Product Detail
-![Product Detail](wwwroot/images/screenshots/product-detail.png)
+![Product Detail](HandmadeShop/wwwroot/images/screenshots/product-detail_1.png)
+![Product Detail](HandmadeShop/wwwroot/images/screenshots/product-detail_2.png)
+![Product Detail](HandmadeShop/wwwroot/images/screenshots/product-detail_3.png)
 *Detailed product information with image gallery and variants*
 
 #### Shopping Cart
-![Shopping Cart](wwwroot/images/screenshots/cart.png)
+![Shopping Cart](HandmadeShop/wwwroot/images/screenshots/cart.png)
 *Interactive cart with real-time updates and discount application*
+
+#### Userpage
+![Userpage](HandmadeShop/wwwroot/images/screenshots/userpage.png)
+*A user account page that allows you to view and update your personal information quickly and easily."*
+
+#### Paygment
+![Paygment](HandmadeShop/wwwroot/images/screenshots/payment_1.png)
+![Paygment](HandmadeShop/wwwroot/images/screenshots/payment_2.png)
+![Paygment](HandmadeShop/wwwroot/images/screenshots/payment_3.png)
+![Paygment](HandmadeShop/wwwroot/images/screenshots/payment_4.png)
+
+#### Faq
+![Faq](HandmadeShop/wwwroot/images/screenshots/faq.png)
 
 ### Admin Interface
 
 #### Dashboard
-![Admin Dashboard](wwwroot/images/screenshots/admin-dashboard.png)
+![Admin Dashboard](HandmadeShop/wwwroot/images/screenshots/admin-dashboard.png)
 *Comprehensive analytics and sales overview*
 
 #### Product Management
-![Product Management](wwwroot/images/screenshots/admin-products.png)
+![Product Management](HandmadeShop/wwwroot/images/screenshots/admin-products.png)
 *Powerful product management with bulk operations*
 
 #### Order Management
-![Order Management](wwwroot/images/screenshots/admin-orders.png)
+![Order Management](HandmadeShop/wwwroot/images/screenshots/admin-orders.png)
 *Efficient order processing and tracking system*
 
 ## 🚀 Getting Started
