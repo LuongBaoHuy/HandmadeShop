@@ -1,0 +1,1502 @@
+@model doan1.Models.CreateProductViewModel
+
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+}
+
+<div class="products-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h1>Thêm sản phẩm mới</h1>
+                <p>Bước 1: Nhập thông tin cơ bản sản phẩm</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="create-container">
+        <form asp-action="Create" enctype="multipart/form-data" class="product-form">
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <!-- XÓA toggle cũ "hasAttributesToggle" để tránh trùng với khối biến thể bên dưới -->
+            <!-- ĐÃ LOẠI BỎ:
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label" style="font-weight:600;">
+                    <input type="checkbox" id="hasAttributesToggle" name="HasAttributes" value="true" style="margin-right:8px;" />
+                    Sản phẩm có phân loại/thuộc tính (ví dụ: màu sắc, kích thước...)
+                </label>
+            </div>
+            <input type="hidden" id="HasAttributesHidden" name="HasAttributesHidden" value="false" />
+            -->
+            <div class="form-layout">
+                <!-- Form chính -->
+                <div class="glass-card form-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin cơ bản
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label asp-for="Name" class="form-label">Tên sản phẩm</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-cube"></i>
+                                    </div>
+                                    <input asp-for="Name" class="glass-input" placeholder="Nhập tên sản phẩm..." />
+                                </div>
+                                <span asp-validation-for="Name" class="validation-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CategoryId" class="form-label">Danh mục</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-tag"></i>
+                                    </div>
+                                    <select asp-for="CategoryId" class="glass-select" asp-items="ViewBag.CategoryId">
+                                        <option value="">-- Chọn danh mục --</option>
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CategoryId" class="validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label">Mô tả sản phẩm</label>
+                            <textarea asp-for="Description" class="glass-textarea" rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                            <span asp-validation-for="Description" class="validation-error"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card pricing-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-dollar-sign"></i>
+                            Thông tin giá
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label asp-for="Price" class="form-label">Giá bán</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-tag"></i>
+                                    </div>
+                                    <input asp-for="Price" class="glass-input" type="number" step="0.01" placeholder="0" />
+                                    <div class="input-suffix">VNĐ</div>
+                                </div>
+                                <span asp-validation-for="Price" class="validation-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="OriginalPrice" class="form-label">Giá gốc</label>
+                                <div class="input-group">   
+                                    <div class="input-icon">
+                                        <i class="fas fa-tags"></i>
+                                    </div>
+                                    <input asp-for="OriginalPrice" class="glass-input" type="number" step="0.01" placeholder="0" />
+                                    <div class="input-suffix">VNĐ</div>
+                                </div>
+                                <span asp-validation-for="OriginalPrice" class="validation-error"></span>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="DiscountedPrice" class="form-label">Giá khuyến mãi</label>
+                                <div class="input-group">
+                                    <div class="input-icon">
+                                        <i class="fas fa-tags"></i>
+                                    </div>
+                                    <input asp-for="DiscountedPrice" class="glass-input" type="number" step="0.01" placeholder="0%" min="0" max="100" />
+                                    <div class="input-suffix">%</div>
+                                </div>
+                                <span asp-validation-for="DiscountedPrice" class="validation-error"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Stock" class="form-label">Số lượng tồn kho</label>
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-boxes"></i>
+                                </div>
+                                <input asp-for="Stock" class="glass-input" type="number" placeholder="0" />
+                                <div class="input-suffix">sản phẩm</div>
+                            </div>
+                            <span asp-validation-for="Stock" class="validation-error"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-card image-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-images"></i>
+                            Hình ảnh sản phẩm
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="ProductImages" class="form-label">Chọn hình ảnh</label>
+                            <div class="file-upload-area" id="fileUploadArea">
+                                <input type="file" class="file-input" id="ProductImages" name="ProductImages" accept="image/*" multiple />
+                                <input type="hidden" id="MainImageIndex" name="MainImageIndex" value="0" />
+                                <div class="upload-content">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <h4>Kéo thả ảnh vào đây hoặc click để chọn</h4>
+                                    <p>Chấp nhận: JPG, JPEG, PNG, GIF, BMP. Tối đa 5MB. Có thể chọn nhiều ảnh.</p>
+                                </div>
+
+                                <!-- Preview nhiều ảnh + chọn ảnh chính -->
+                                <div id="uploadPreviewGrid" class="upload-preview-grid" style="display:none;"></div>
+                            </div>
+                            <span asp-validation-for="ImageUrl" class="validation-error"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Variations management -->
+                <div class="glass-card variations-card">
+                    <div class="card-header">
+                        <h3>
+                            <i class="fas fa-layer-group"></i>
+                            Phân loại/biến thể sản phẩm
+                        </h3>
+                        <div class="variation-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="enableVariations" />
+                                <span class="slider"></span>
+                            </label>
+                            <span class="toggle-label">Bật phân loại hàng</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert-info" id="variationInfoText">
+                            <i class="fas fa-info-circle"></i>
+                            Sản phẩm này không có biến thể. Bật chế độ biến thể để tạo các thuộc tính khác nhau.
+                        </div>
+
+                        <div id="variationsContent" style="display: none;">
+                            <!-- Shopee style: tối đa 3 thuộc tính -->
+                            <div class="attributes-section">
+                                <div class="section-header">
+                                    <h4>Thuộc tính (tối đa 3)</h4>
+                                    <div class="hint" style="color:#6c757d;font-size:.9rem;">
+                                        Nhập tên "Phân loại 1/2/3", thêm giá trị bằng Enter hoặc dấu phẩy.
+                                    </div>
+                                </div>
+
+                                <div id="attributesList" class="attributes-list">
+                                    <!-- Attribute Row Template sẽ được thêm bằng JS -->
+                                </div>
+                                <div style="margin-top:12px;">
+                                    <button type="button" id="addAttributeBtn" class="glass-btn success small">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Thêm thuộc tính</span>
+                                    </button>
+                                    <span id="attrLimitNote" style="margin-left:10px;color:#6c757d;font-size:.9rem;display:none;">
+                                        Đã đạt tối đa 3 thuộc tính.
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="generate-section">
+                                <button type="button" id="generateVariationsBtn" class="glass-btn primary">
+                                    <i class="fas fa-magic"></i>
+                                    <span>Tạo tất cả biến thể</span>
+                                </button>
+                            </div>
+
+                            <div class="variations-section">
+                                <div class="bulk-actions">
+                                    <div class="bulk-group">
+                                        <label>Áp dụng cho tất cả:</label>
+                                        <input type="number" id="bulkPrice" class="glass-input" placeholder="Giá" step="1000" min="0" />
+                                        <input type="number" id="bulkStock" class="glass-input" placeholder="Tồn kho" min="0" />
+                                        <button type="button" id="applyBulkBtn" class="glass-btn secondary small">
+                                            <i class="fas fa-check"></i>
+                                            Áp dụng
+                                        </button>
+                                    </div>
+                                    <div class="stats">
+                                        Tổng biến thể: <strong id="variationCount">0</strong>
+                                    </div>
+                                </div>
+
+                                <h4>Danh sách biến thể</h4>
+                                <div id="emptyVariations" class="empty-state">
+                                    <i class="fas fa-box-open"></i>
+                                    Chưa có biến thể nào. Hãy thêm thuộc tính và bấm "Tạo tất cả biến thể".
+                                </div>
+                                <table id="variationsTable" class="table" style="display: none;">
+                                    <thead>
+                                        <tr>
+                                            <th>Biến thể</th>
+                                            <th>Giá bán</th>
+                                            <th>Tồn kho</th>
+                                            <th>Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="variationsTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Action buttons -->
+            <div class="glass-card actions-card">
+                <div class="card-body">
+                    <div class="action-buttons">
+                        <a asp-action="Index" class="glass-btn secondary large">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Quay lại danh sách</span>
+                        </a>
+                        <button type="submit" id="submitProductBtn" class="glass-btn primary large">
+                            <i class="fas fa-arrow-right"></i>
+                            <span id="submitProductBtnText">Tạo sản phẩm</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Gỡ bỏ logic toggle cũ của "hasAttributesToggle"
+        // Thêm logic cho phần biến thể
+        document.addEventListener('DOMContentLoaded', function () {
+            // Form controls
+            const priceInput = document.querySelector('input[name="Price"]');
+            const stockInput = document.querySelector('input[name="Stock"]');
+
+            // ===== VARIATION MANAGEMENT =====
+            const enableVariationsCheckbox = document.getElementById('enableVariations');
+            const variationsContent = document.getElementById('variationsContent');
+            const variationInfoText = document.getElementById('variationInfoText');
+            const attributesList = document.getElementById('attributesList');
+            const addAttributeBtn = document.getElementById('addAttributeBtn');
+            const attrLimitNote = document.getElementById('attrLimitNote');
+
+            const generateBtn = document.getElementById('generateVariationsBtn');
+            const bulkPrice = document.getElementById('bulkPrice');
+            const bulkStock = document.getElementById('bulkStock');
+            const applyBulkBtn = document.getElementById('applyBulkBtn');
+            const variationCount = document.getElementById('variationCount');
+
+            const tbody = document.getElementById('variationsTableBody');
+            const emptyState = document.getElementById('emptyVariations');
+            const table = document.getElementById('variationsTable');
+
+            let variations = [];
+            let attributeIndex = 0;
+
+            // Helpers for chip inputs
+            function createAttributeRow(order) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'attribute-item';
+                wrapper.dataset.order = order;
+
+                wrapper.innerHTML = `
+                    <div class="attribute-header">
+                        <input type="text" class="glass-input attribute-name"
+                               placeholder="Phân loại ${order} (vd: Màu sắc)" required />
+                        <button type="button" class="glass-btn danger small remove-attribute">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="attribute-options">
+                        <div class="chips" data-chip-container="true"></div>
+                        <input type="text" class="glass-input chip-input" placeholder="Nhập giá trị rồi nhấn Enter hoặc dấu phẩy (,)" />
+                        <div class="hint" style="color:#6c757d;font-size:.85rem;margin-top:6px;">
+                            Ví dụ: Đỏ, Xanh, Vàng
+                        </div>
+                    </div>
+                `;
+
+                // wire events
+                const chipInput = wrapper.querySelector('.chip-input');
+                const chipsBox = wrapper.querySelector('.chips');
+
+                chipInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        const raw = chipInput.value.trim().replace(/,+$/, '');
+                        if (raw) addChip(chipsBox, raw);
+                        chipInput.value = '';
+                    }
+                });
+                chipInput.addEventListener('blur', () => {
+                    const raw = chipInput.value.trim().replace(/,+$/, '');
+                    if (raw) {
+                        addChip(chipsBox, raw);
+                        chipInput.value = '';
+                    }
+                });
+
+                wrapper.querySelector('.remove-attribute').addEventListener('click', () => {
+                    wrapper.remove();
+                    updateAttrLimit();
+                });
+
+                return wrapper;
+            }
+
+            function addChip(container, value) {
+                // ignore duplicate (case-insensitive)
+                const exists = Array.from(container.querySelectorAll('.chip-text'))
+                    .some(x => x.textContent.trim().toLowerCase() === value.toLowerCase());
+                if (exists) return;
+
+                const chip = document.createElement('span');
+                chip.className = 'chip';
+                chip.innerHTML = `
+                    <span class="chip-text">${value}</span>
+                    <button type="button" class="chip-remove" aria-label="remove">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                chip.querySelector('.chip-remove').addEventListener('click', () => {
+                    chip.remove();
+                });
+                container.appendChild(chip);
+            }
+
+            function collectAttributes() {
+                const attrs = [];
+                attributesList.querySelectorAll('.attribute-item').forEach((row) => {
+                    const name = row.querySelector('.attribute-name').value.trim();
+                    if (!name) return;
+                    const values = Array.from(row.querySelectorAll('.chip .chip-text'))
+                        .map(x => x.textContent.trim())
+                        .filter(v => v.length > 0);
+                    if (values.length > 0) {
+                        attrs.push({ name, options: values });
+                    }
+                });
+                return attrs;
+            }
+
+            function generateCombinations(attrs) {
+                if (attrs.length === 0) return [];
+                let result = [[]];
+                attrs.forEach(attr => {
+                    const temp = [];
+                    attr.options.forEach(opt => {
+                        result.forEach(prev => {
+                            // dùng Name/Value để khớp ViewModel trên server
+                            temp.push([...prev, { Name: attr.name, Value: opt }]);
+                        });
+                    });
+                    result = temp;
+                });
+                return result;
+            }
+
+            function renderVariations() {
+                tbody.innerHTML = '';
+                if (!variations.length) {
+                    table.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    variationCount.textContent = '0';
+                    return;
+                }
+                table.style.display = 'table';
+                emptyState.style.display = 'none';
+                variationCount.textContent = String(variations.length);
+
+                variations.forEach((v, idx) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            <div class="variation-attributes">${v.displayName}</div>
+                        </td>
+                        <td>
+                            <input type="number" class="glass-input variation-price" 
+                                   value="${v.price}" min="0" step="1000"
+                                   data-idx="${idx}">
+                        </td>
+                        <td>
+                            <input type="number" class="glass-input variation-stock" 
+                                   value="${v.stock}" min="0"
+                                   data-idx="${idx}">
+                        </td>
+                        <td>
+                            <button type="button" class="glass-btn danger small delete-variation" data-idx="${idx}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                // wire events
+                tbody.querySelectorAll('.variation-price').forEach(inp => {
+                    inp.addEventListener('input', e => {
+                        const i = parseInt(e.target.getAttribute('data-idx'));
+                        variations[i].price = parseFloat(e.target.value || '0') || 0;
+                    });
+                });
+                tbody.querySelectorAll('.variation-stock').forEach(inp => {
+                    inp.addEventListener('input', e => {
+                        const i = parseInt(e.target.getAttribute('data-idx'));
+                        variations[i].stock = parseInt(e.target.value || '0') || 0;
+                    });
+                });
+                tbody.querySelectorAll('.delete-variation').forEach(btn => {
+                    btn.addEventListener('click', e => {
+                        const i = parseInt(e.currentTarget.getAttribute('data-idx'));
+                        variations.splice(i, 1);
+                        renderVariations();
+                    });
+                });
+            }
+
+            function updateAttrLimit() {
+                const count = attributesList.querySelectorAll('.attribute-item').length;
+                if (count >= 3) {
+                    addAttributeBtn.disabled = true;
+                    attrLimitNote.style.display = 'inline';
+                } else {
+                    addAttributeBtn.disabled = false;
+                    attrLimitNote.style.display = 'none';
+                }
+            }
+
+            // Toggle enable variations
+            enableVariationsCheckbox.addEventListener('change', function () {
+                const on = this.checked;
+                variations = [];
+                renderVariations();
+                if (on) {
+                    variationsContent.style.display = 'block';
+                    variationInfoText.textContent = 'Tạo các thuộc tính (Phân loại 1/2/3) để sinh ra các biến thể với giá và tồn kho riêng.';
+                } else {
+                    variationsContent.style.display = 'none';
+                    variationInfoText.textContent = 'Sản phẩm này không có biến thể. Bật chế độ biến thể để tạo các thuộc tính khác nhau.';
+                    attributesList.innerHTML = '';
+                    attributeIndex = 0;
+                }
+
+                // Disable/enable base price & stock (giống Shopee)
+                if (priceInput) priceInput.disabled = on;
+                if (stockInput) stockInput.disabled = on;
+            });
+
+            // Add attribute row
+            addAttributeBtn.addEventListener('click', function () {
+                const current = attributesList.querySelectorAll('.attribute-item').length;
+                if (current >= 3) return;
+                attributeIndex++;
+                attributesList.appendChild(createAttributeRow(current + 1));
+                updateAttrLimit();
+            });
+
+            // Generate all variations
+            generateBtn.addEventListener('click', function () {
+                const attrs = collectAttributes();
+                if (!attrs.length) {
+                    alert('Vui lòng thêm ít nhất một thuộc tính và giá trị!');
+                    return;
+                }
+                const combos = generateCombinations(attrs);
+                // default price/stock from base if available else 0
+                const basePrice = parseFloat(priceInput?.value || '0') || 0;
+                const baseStock = parseInt(stockInput?.value || '0') || 0;
+
+                variations = combos.map((combo, i) => ({
+                    id: i,
+                    attributes: combo,
+                    price: basePrice,
+                    stock: baseStock,
+                    displayName: combo.map(a => `${a.Name}: ${a.Value}`).join(', ')
+                }));
+                renderVariations();
+            });
+
+            // Bulk apply
+            applyBulkBtn.addEventListener('click', function () {
+                const p = bulkPrice.value.trim();
+                const s = bulkStock.value.trim();
+                if (p === '' && s === '') return;
+
+                variations = variations.map(v => ({
+                    ...v,
+                    price: p !== '' ? (parseFloat(p) || 0) : v.price,
+                    stock: s !== '' ? (parseInt(s) || 0) : v.stock
+                }));
+                renderVariations();
+            });
+
+            // Handle form submit -> append hidden inputs for variations
+            document.querySelector('.product-form').addEventListener('submit', function (e) {
+                const hasVariations = enableVariationsCheckbox.checked;
+                if (hasVariations && variations.length > 0) {
+                    // clear previous hidden inputs (if any)
+                    this.querySelectorAll('input[type="hidden"][data-variation-hidden="1"]').forEach(x => x.remove());
+
+                    variations.forEach((v, idx) => {
+                        const h1 = document.createElement('input');
+                        h1.type = 'hidden';
+                        h1.dataset.variationHidden = '1';
+                        h1.name = `Variations[${idx}].Attributes`;
+                        h1.value = JSON.stringify(v.attributes);
+                        this.appendChild(h1);
+
+                        const h2 = document.createElement('input');
+                        h2.type = 'hidden';
+                        h2.dataset.variationHidden = '1';
+                        h2.name = `Variations[${idx}].Price`;
+                        h2.value = v.price;
+                        this.appendChild(h2);
+
+                        const h3 = document.createElement('input');
+                        h3.type = 'hidden';
+                        h3.dataset.variationHidden = '1';
+                        h3.name = `Variations[${idx}].Stock`;
+                        h3.value = v.stock;
+                        this.appendChild(h3);
+                    });
+
+                    // Không gửi SelectedAttributeOptionIds/NewOption_* để tránh sinh biến thể trùng ở Controller
+                }
+            });
+
+            // ===== Multiple images preview + main selection =====
+            const filesInput = document.getElementById('ProductImages');
+            const previewGrid = document.getElementById('uploadPreviewGrid');
+            const mainIdxHidden = document.getElementById('MainImageIndex');
+
+            function renderPreviews(files) {
+                if (!files || files.length === 0) {
+                    previewGrid.style.display = 'none';
+                    previewGrid.innerHTML = '';
+                    mainIdxHidden.value = '0';
+                    return;
+                }
+                previewGrid.style.display = 'grid';
+                previewGrid.innerHTML = '';
+
+                Array.from(files).forEach((file, idx) => {
+                    const url = URL.createObjectURL(file);
+                    const item = document.createElement('div');
+                    item.className = 'preview-item';
+                    item.innerHTML = `
+                        <img src="${url}" alt="img-${idx}" />
+                        <label class="main-choice">
+                            <input type="radio" name="mainImageRadio" value="${idx}" ${idx===0 ? 'checked' : ''}/>
+                            Ảnh chính
+                        </label>
+                    `;
+                    previewGrid.appendChild(item);
+                });
+
+                // set default main = 0
+                mainIdxHidden.value = '0';
+                previewGrid.querySelectorAll('input[name="mainImageRadio"]').forEach(r => {
+                    r.addEventListener('change', e => {
+                        mainIdxHidden.value = e.target.value;
+                    });
+                });
+            }
+
+            filesInput?.addEventListener('change', (e) => {
+                renderPreviews(e.target.files);
+            });
+
+            // Optional: drag-over highlight
+            const area = document.getElementById('fileUploadArea');
+            ['dragenter','dragover'].forEach(evt => area.addEventListener(evt, e => { e.preventDefault(); area.classList.add('drag-over'); }));
+            ['dragleave','drop'].forEach(evt => area.addEventListener(evt, e => { e.preventDefault(); area.classList.remove('drag-over'); }));
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .products-container {
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .create-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        .form-card {
+            grid-column: 1 / -1;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            z-index: 2;
+        }
+
+        .glass-input, .glass-select, .glass-textarea {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-input {
+            padding-left: 3rem;
+        }
+
+        .glass-input:focus, .glass-select:focus, .glass-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .validation-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .validation-summary {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--danger);
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            position: relative;
+            border: 2px dashed rgba(0, 102, 204, 0.3);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.drag-over {
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-icon i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+        }
+
+        .upload-content h4 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .upload-content p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .upload-preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .upload-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 1rem;
+        }
+
+        .remove-image {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-image:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Product Preview */
+        .product-preview {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .preview-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            flex-shrink: 0;
+        }
+
+        .placeholder-image {
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .placeholder-image i {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-info {
+            flex: 1;
+        }
+
+        .preview-info h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .category-preview {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .category-preview.selected {
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .price-preview {
+            margin-bottom: 1rem;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+        }
+
+        .description-preview {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .stock-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stock-preview i {
+            color: var(--primary-blue);
+        }
+
+        /* Action buttons */
+        .actions-card .card-body {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var (--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .glass-btn.large {
+            padding: 1.25rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .glass-btn.primary::before {
+            background: var(--gradient-secondary);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        @@media (max-width: 1200px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .products-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .form-grid,
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .product-preview {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .preview-image {
+                width: 100%;
+                height: 250px;
+                margin: 0 auto;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Variation Management Styles */
+        .variations-card {
+            grid-column: 1 / -1;
+        }
+        
+        .variations-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .variation-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-blue);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-blue);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        
+        .alert-info {
+            background: rgba(13, 202, 240, 0.1);
+            border: 1px solid rgba(13, 202, 240, 0.3);
+            color: #0dcaf0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .attributes-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section-header h4 {
+            margin: 0;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .attributes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .attribute-item {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .attribute-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .attribute-header .glass-input {
+            flex: 1;
+        }
+        
+        .attribute-options {
+            margin-left: 10px;
+        }
+        
+        .options-list {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .option-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .option-item .glass-input {
+            flex: 1;
+        }
+        
+        .glass-btn.small {
+            padding: 6px 12px;
+            font-size: 12px;
+            min-width: auto;
+        }
+        
+        .glass-btn.danger {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+        
+        .glass-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .glass-btn.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        .glass-btn.success:hover {
+            background: rgba(16, 185, 129, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .generate-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .variations-section h4 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            border: 2px dashed rgba(0, 102, 204, 0.3);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+            color: var(--primary-blue);
+        }
+        
+        .table {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .table th {
+            background: rgba(0, 102, 204, 0.1);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+        
+        .variation-attributes {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .variation-price, .variation-stock {
+            width: 120px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        /* Shopee-like chips */
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: rgba(0, 102, 204, 0.08);
+            border: 1px solid rgba(0, 102, 204, 0.22);
+            color: #1e88e5;
+            border-radius: 999px;
+            font-size: 0.9rem;
+        }
+        .chip-remove {
+            background: transparent;
+            border: none;
+            color: #1e88e5;
+            cursor: pointer;
+        }
+        .chip-input {
+            width: 100%;
+        }
+
+        /* Bulk actions bar */
+        .bulk-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,.5);
+            border: 1px solid rgba(0,0,0,.05);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .bulk-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .bulk-group label {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .bulk-group .glass-input {
+            width: 160px;
+        }
+        .stats {
+            color: var(--text-secondary);
+        }
+
+        /* Grid preview nhiều ảnh */
+        .upload-preview-grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+        }
+        .preview-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255,255,255,.6);
+            border: 1px solid rgba(0,0,0,.06);
+            box-shadow: var(--shadow-light);
+        }
+        .preview-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+        .preview-item .main-choice {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            font-size: .9rem;
+            color: var(--text-primary);
+            background: rgba(255,255,255,.8);
+        }
+    </style>
+}

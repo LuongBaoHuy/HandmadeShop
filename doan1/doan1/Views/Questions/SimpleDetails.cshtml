@@ -1,0 +1,103 @@
+@model doan1.Models.Question
+
+@{
+    ViewData["Title"] = "Chi tiết câu hỏi";
+}
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="fas fa-question-circle text-primary"></i> Chi tiết câu hỏi</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <!-- Thông báo -->
+    @if (TempData["QuestionsSuccess"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["QuestionsSuccess"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    
+    @if (TempData["QuestionsError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["QuestionsError"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- Question Content -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Question Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle"></i> Câu hỏi #@Model.Id
+                        <span class="badge @(Model.Status == "pending" ? "bg-warning" : "bg-success") ms-2">
+                            @(Model.Status == "pending" ? "Chưa trả lời" : "Đã trả lời")
+                        </span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nội dung:</strong></p>
+                    <div class="alert alert-light">
+                        @Model.Content
+                    </div>
+                    <small class="text-muted">
+                        <i class="fas fa-calendar"></i> Ngày tạo: @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")
+                    </small>
+                </div>
+            </div>
+
+            <!-- Add Answer Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-reply"></i> Trả lời câu hỏi</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="AddAnswer" method="post">
+                        <input type="hidden" name="questionId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Nội dung trả lời</label>
+                            <textarea name="content" class="form-control" rows="4" required 
+                                      placeholder="Nhập câu trả lời cho khách hàng..."></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Gửi trả lời
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Existing Answers -->
+            @if (ViewBag.Answers != null)
+            {
+                <div class="mt-4">
+                    <h5><i class="fas fa-comments"></i> Các câu trả lời</h5>
+                    @foreach (var answer in ViewBag.Answers)
+                    {
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <p>@answer.Content</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> @answer.CreatedAt?.ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Test Database";
+}
+
+<h2>Kiểm tra dữ liệu Questions</h2>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        <strong>Lỗi:</strong> @ViewBag.Error
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <strong>Tổng số câu hỏi trong database:</strong> @ViewBag.TotalQuestions
+    </div>
+
+    @if (ViewBag.AllQuestions != null)
+    {
+        <h3>10 câu hỏi đầu tiên:</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Content</th>
+                    <th>UserId</th>
+                    <th>Status</th>
+                    <th>CreatedAt</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var question in ViewBag.AllQuestions)
+                {
+                    <tr>
+                        <td>@question.Id</td>
+                        <td>@question.Content</td>
+                        <td>@question.UserId</td>
+                        <td>@question.Status</td>
+                        <td>@question.CreatedAt</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}

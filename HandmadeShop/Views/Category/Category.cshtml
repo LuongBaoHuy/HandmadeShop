@@ -1,0 +1,491 @@
+﻿@model X.PagedList.IPagedList<HandmadeShop.Models.Product>
+@using X.PagedList;
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@{
+    ViewBag.Title = "Category";
+}
+
+<div class="body-content outer-top-xs">
+    <div class='container'>
+        <div class='row'>            
+            <div class="col-xs-12 col-sm-12 col-md-3 sidebar">
+                <!-- ================================== CATEGORIES MENU ================================== -->
+                <div class="side-menu animate-dropdown outer-bottom-xs">
+                    <div class="category-header">
+                        <div class="head"><i class="icon fa fa-align-justify fa-fw"></i> Danh mục</div>
+                        <button class="toggle-categories" type="button">
+                            <i class="fa fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="category-list-container">
+                        <ul class="category-list">
+                            @if (ViewBag.Categories != null)
+                            {
+                                foreach (var category in ViewBag.Categories)
+                                {
+                                    <li class="category-item">
+                                        <a href="@Url.Action("Category", "Category", new { id = category.Id })" class="category-link">
+                                            <i class="icon fa fa-folder" aria-hidden="true"></i>
+                                            <span class="category-name">@category.CategoriesName</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- ================================== PRICE FILTER ================================== -->
+                <div class="sidebar-widget">
+                    <div class="widget-header">
+                        <h4 class="widget-title">Lọc theo giá</h4>
+                    </div>
+                    <div class="sidebar-widget-body">
+                        <div class="price-range-holder">
+                            <form id="priceFilterForm" method="get">
+                                <input type="hidden" name="id" value="@ViewBag.CategoryId" />
+                                <input type="hidden" name="keyword" value="@ViewBag.Keyword" />
+                                <input type="hidden" name="sortBy" value="@ViewBag.CurrentSort" />
+                                <input type="hidden" name="minRating" value="@ViewBag.MinRating" />
+                                <input type="hidden" name="isNew" value="@ViewBag.IsNew" />
+                                
+                                <div class="price-inputs">
+                                    <div class="price-input-group">
+                                        <label>Từ:</label>
+                                        <input type="number" name="minPrice" value="@ViewBag.MinPrice" 
+                                               class="form-control price-input" placeholder="0" min="0" step="1000">
+                                    </div>
+                                    <div class="price-input-group">
+                                        <label>Đến:</label>
+                                        <input type="number" name="maxPrice" value="@ViewBag.MaxPrice" 
+                                               class="form-control price-input" placeholder="1000000" min="0" step="1000">
+                                    </div>
+                                </div>
+                                
+                                <div class="price-range-slider">
+                                    <div id="price-slider"></div>
+                                </div>
+                                
+                                <div class="price-quick-select">
+                                    <button type="button" class="btn btn-sm price-quick-btn" data-min="0" data-max="100000">Dưới 100k</button>
+                                    <button type="button" class="btn btn-sm price-quick-btn" data-min="100000" data-max="300000">100k - 300k</button>
+                                    <button type="button" class="btn btn-sm price-quick-btn" data-min="300000" data-max="500000">300k - 500k</button>
+                                    <button type="button" class="btn btn-sm price-quick-btn" data-min="500000" data-max="999999999">Trên 500k</button>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-block filter-btn">
+                                    <i class="fa fa-filter"></i> Áp dụng
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================================== RATING FILTER ================================== -->
+                <div class="sidebar-widget">
+                    <div class="widget-header">
+                        <h4 class="widget-title">Đánh giá</h4>
+                    </div>
+                    <div class="sidebar-widget-body">
+                        <ul class="list">
+                            <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = 5, isNew = ViewBag.IsNew })">
+                                <span class="rating-stars">★★★★★</span> (5 sao)
+                            </a></li>
+                            <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = 4, isNew = ViewBag.IsNew })">
+                                <span class="rating-stars">★★★★☆</span> (4 sao trở lên)
+                            </a></li>
+                            <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = 3, isNew = ViewBag.IsNew })">
+                                <span class="rating-stars">★★★☆☆</span> (3 sao trở lên)
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- ================================== SPECIAL FILTERS ================================== -->
+                <div class="sidebar-widget">
+                    <div class="widget-header">
+                        <h4 class="widget-title">Bộ lọc đặc biệt</h4>
+                    </div>
+                    <div class="sidebar-widget-body">
+                        <ul class="list special-filters">
+                            <li>
+                                <a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = true })"
+                                   class="@(ViewBag.IsNew == true ? "active" : "")">
+                                    <i class="fa fa-star"></i> Sản phẩm mới
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "price_asc", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })"
+                                   class="@(ViewBag.CurrentSort == "price_asc" ? "active" : "")">
+                                    <i class="fa fa-arrow-up"></i> Giá thấp nhất
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "price_desc", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })"
+                                   class="@(ViewBag.CurrentSort == "price_desc" ? "active" : "")">
+                                    <i class="fa fa-arrow-down"></i> Giá cao nhất
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- ================================== CLEAR FILTERS ================================== -->
+                <div class="sidebar-widget">
+                    <a href="@Url.Action("Category", new { id = ViewBag.CategoryId })" class="btn btn-warning btn-block clear-filters-btn">
+                        <i class="fa fa-refresh"></i> Xóa bộ lọc
+                    </a>
+                </div>
+            </div>
+            
+            <!-- /.sidebar -->
+            <div class='col-md-9'>
+                <!-- ================================== SORTING OPTIONS ================================== -->
+                <div class="search-result-container">
+                    <div class="clearfix filters-container">
+                        <div class="row" style="padding-bottom: 20px">
+                            <div class="col-sm-6">
+                                <div class="results-info">
+                                    <h4 class="section-title">@ViewBag.CategoryName</h4>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="pull-right">
+                                    <div class="lbl-cnt" style="text-align: right">
+                                        <span class="lbl">Sắp xếp:</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="pull-right">
+                                    <div class="lbl-cnt">
+                                        <div class="dropdown dropdown-small">
+                                            <button class="btn dropdown-toggle" type="button" data-toggle="dropdown">
+                                                @switch (ViewBag.CurrentSort)
+                                                {
+                                                    case "price_asc":
+                                                        <text>Giá: Thấp đến cao</text>
+                                                        break;
+                                                    case "price_desc":
+                                                        <text>Giá: Cao đến thấp</text>
+                                                        break;
+                                                    case "rating":
+                                                        <text>Đánh giá cao nhất</text>
+                                                        break;
+                                                    case "newest":
+                                                        <text>Mới nhất</text>
+                                                        break;
+                                                    default:
+                                                        <text>Tên A-Z</text>
+                                                        break;
+                                                }
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "name", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })">Tên A-Z</a></li>
+                                                <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "price_asc", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })">Giá: Thấp đến cao</a></li>
+                                                <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "price_desc", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })">Giá: Cao đến thấp</a></li>
+                                                <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "rating", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })">Đánh giá cao nhất</a></li>
+                                                <li><a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = "newest", minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })">Mới nhất</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ================================== ACTIVE FILTERS DISPLAY ================================== -->
+                    @if (ViewBag.MinPrice != null || ViewBag.MaxPrice != null || ViewBag.MinRating != null || ViewBag.IsNew == true)
+                    {
+                        <div class="active-filters">
+                            <div class="filter-tags">
+                                <span class="filter-label">Bộ lọc hiện tại:</span>
+                                @if (ViewBag.MinPrice != null || ViewBag.MaxPrice != null)
+                                {
+                                    <span class="filter-tag">
+                                        Giá: @(ViewBag.MinPrice ?? 0).ToString("N0") - @(ViewBag.MaxPrice ?? 1000000).ToString("N0") VNĐ
+                                        <a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minRating = ViewBag.MinRating, isNew = ViewBag.IsNew })" class="remove-filter">×</a>
+                                    </span>
+                                }
+                                @if (ViewBag.MinRating != null)
+                                {
+                                    <span class="filter-tag">
+                                        @ViewBag.MinRating sao trở lên
+                                        <a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, isNew = ViewBag.IsNew })" class="remove-filter">×</a>
+                                    </span>
+                                }
+                                @if (ViewBag.IsNew == true)
+                                {
+                                    <span class="filter-tag">
+                                        Sản phẩm mới
+                                        <a href="@Url.Action("Category", new { id = ViewBag.CategoryId, keyword = ViewBag.Keyword, sortBy = ViewBag.CurrentSort, minPrice = ViewBag.MinPrice, maxPrice = ViewBag.MaxPrice, minRating = ViewBag.MinRating })" class="remove-filter">×</a>
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <!-- ================================== PRODUCTS GRID ================================== -->
+                    <div class="category-product">
+                        <div class="row">
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    // Tính toán rating trung bình
+                                    var avgRating = item.Reviews.Any() ? item.Reviews.Average(r => (double)r.Rating) : 0;
+                                    var fullStars = (int)Math.Floor(avgRating);
+                                    var hasHalfStar = avgRating - fullStars >= 0.5;
+                                    var emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                    var reviewCount = item.Reviews.Count();
+
+                                    // Tính giá giảm
+                                    var hasDiscount = item.OriginalPrice.HasValue && item.OriginalPrice > item.Price;
+                                    var discountPercent = hasDiscount ? 
+                                        Math.Round(((item.OriginalPrice.Value - (item.Price ?? 0)) / item.OriginalPrice.Value) * 100) : 0;
+
+                                    <div class="col-sm-6 col-md-4 wow fadeInUp" style="padding-bottom: 25px;">
+                                        <div class="products" data-product-id="@item.Id">
+                                            <div class="product">
+                                                <div class="product-image">
+                                                    <div class="image">
+                                                        <a href="@Url.Action("Detail", "Detail", new { id = item.Id })">
+                                                            <img src="@item.ImageUrl" alt="@item.Name" />
+                                                        </a>
+                                                    </div>
+
+                                                    <!-- Tags -->
+                                                    @if (item.DiscountedPrice != null && item.DiscountedPrice > 0)
+                                                    {
+                                                        <div class="tag discount"><span>-@((int)(item.DiscountedPrice * 100))%</span></div>
+                                                    }
+                                                    else if (item.Stock > 0 && item.Stock <= 10)
+                                                    {
+                                                        <div class="tag new low-stock"><span>low stock</span></div>
+                                                    }
+                                                    else if (item.Stock > 10)
+                                                    {
+                                                        <div class="tag new"><span>new</span></div>
+                                                    }
+                                                </div>
+
+                                                <div class="product-info text-left">
+                                                    <h3 class="name">
+                                                        <a href="@Url.Action("Detail", "Detail", new { id = item.Id })">@item.Name</a>
+                                                    </h3>
+
+                                                    <!-- Rating Display -->
+                                                    <div class="rating-container">
+                                                        <div class="rating-stars">
+                                                            @if (reviewCount > 0)
+                                                            {
+                                                                for (int i = 0; i < fullStars; i++)
+                                                                {
+                                                                    <i class="fa fa-star star-filled"></i>
+                                                                }
+                                                                if (hasHalfStar)
+                                                                {
+                                                                    <i class="fa fa-star-half-o star-half"></i>
+                                                                }
+                                                                for (int i = 0; i < emptyStars; i++)
+                                                                {
+                                                                    <i class="fa fa-star-o star-empty"></i>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                for (int i = 0; i < 5; i++)
+                                                                {
+                                                                    <i class="fa fa-star-o star-empty"></i>
+                                                                }
+                                                            }
+                                                        </div>
+                                                        <div class="rating-info">
+                                                            @if (reviewCount > 0)
+                                                            {
+                                                                <span class="rating-score">@avgRating.ToString("F1")</span>
+                                                                <span class="rating-count">(@reviewCount đánh giá)</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="rating-score">0.0</span>
+                                                                <span class="rating-count">(Chưa có đánh giá)</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="description">
+                                                        @if (!string.IsNullOrEmpty(item.Description) && item.Description.Length > 65)
+                                                        {
+                                                            @($"{item.Description.Substring(0, 65)}...")
+                                                        }
+                                                        else
+                                                        {
+                                                            @item.Description
+                                                        }
+                                                    </div>
+
+                                                    <!-- Price Display -->
+                                                    <div class="product-price">
+                                                        <span class="price current-price">@(item.Price?.ToString("N0") ?? "0") VNĐ</span>
+                                                        @if (hasDiscount)
+                                                        {
+                                                            <span class="price original-price">@(item.OriginalPrice?.ToString("N0")) VNĐ</span>
+                                                        }
+                                                        else if (item.Price < 200000)
+                                                        {
+                                                            <span class="price-before-discount">@($"{item.Price * 1.25m:N0}") VNĐ</span>
+                                                        }
+                                                    </div>                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="col-sm-12">
+                                    <div class="no-products-found">
+                                        <i class="fa fa-search fa-5x"></i>
+                                        <h3>Không tìm thấy sản phẩm</h3>
+                                        <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+                                        <a href="@Url.Action("Category", new { id = ViewBag.CategoryId })" class="btn btn-primary">Xóa bộ lọc</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                    <!-- ================================== PAGINATION ================================== -->
+                    <div class="clearfix filters-container">
+                        <div class="text-right">
+                            <div class="pagination-container">
+                                @Html.PagedListPager(Model, page => Url.Action("Category", new { 
+                                    id = ViewBag.CategoryId, 
+                                    page, 
+                                    keyword = ViewBag.Keyword,
+                                    sortBy = ViewBag.CurrentSort,
+                                    minPrice = ViewBag.MinPrice,
+                                    maxPrice = ViewBag.MaxPrice,
+                                    minRating = ViewBag.MinRating,
+                                    isNew = ViewBag.IsNew
+                                }))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div style="color:red;">@ViewBag.ErrorMessage</div>
+}
+
+<script>
+    $(document).ready(function () {
+        // Add to cart functionality
+        $('.add-to-cart-btn').on('click', function () {
+            var productId = $(this).data('product-id');
+            var quantity = 1;
+            $.ajax({
+                url: '@Url.Action("AddToCart", "Category")',
+                type: 'POST',
+                data: { productId: productId, quantity: quantity },
+                success: function (response) {
+                    if (response.success) {
+                        showCategoryNotification(response.message);
+                        $('#cartCount').text(response.cartCount);
+                        $('#cartTotal').text(response.totalPrice + ' VNĐ');
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra khi thêm vào giỏ hàng!');
+                }
+            });
+        });
+
+        // Price quick select buttons
+        $('.price-quick-btn').on('click', function() {
+            var minPrice = $(this).data('min');
+            var maxPrice = $(this).data('max');
+            $('input[name="minPrice"]').val(minPrice);
+            $('input[name="maxPrice"]').val(maxPrice === 999999999 ? '' : maxPrice);
+            
+            // Highlight selected button
+            $('.price-quick-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+            $(this).removeClass('btn-outline-primary').addClass('btn-primary');
+        });
+
+        // Auto-submit price filter when input changes
+        $('.price-input').on('change', function() {
+            var form = $('#priceFilterForm');
+            var minPrice = $('input[name="minPrice"]').val();
+            var maxPrice = $('input[name="maxPrice"]').val();
+            
+            if (minPrice || maxPrice) {
+                setTimeout(function() {
+                    form.submit();
+                }, 500);
+            }
+        });
+
+        // Wishlist functionality
+        $('.btn-wishlist').on('click', function(e) {
+            e.preventDefault();
+            const icon = $(this).find('i');
+            
+            if (icon.hasClass('fa-heart-o')) {
+                icon.removeClass('fa-heart-o').addClass('fa-heart');
+                $(this).css('color', '#e74c3c');
+                showCategoryNotification('Đã thêm vào danh sách yêu thích!');
+            } else {
+                icon.removeClass('fa-heart').addClass('fa-heart-o');
+                $(this).css('color', '');
+                showCategoryNotification('Đã xóa khỏi danh sách yêu thích!');
+            }
+        });
+
+        // Show notification function
+        function showCategoryNotification(message) {
+            const notification = $(`
+                <div class="cart-notification">
+                    <i class="fa fa-check-circle"></i>
+                    <span>${message}</span>
+                </div>
+            `);
+            
+            notification.css({
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                background: '#27ae60',
+                color: 'white',
+                padding: '15px 20px',
+                'border-radius': '5px',
+                'z-index': 10000,
+                'box-shadow': '0 4px 15px rgba(0,0,0,0.2)',
+                transform: 'translateX(100%)',
+                transition: 'transform 0.3s ease'
+            });
+            
+            $('body').append(notification);
+            
+            setTimeout(() => {
+                notification.css('transform', 'translateX(0)');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.css('transform', 'translateX(100%)');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    });
+</script>

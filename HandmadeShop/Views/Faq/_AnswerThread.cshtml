@@ -1,0 +1,55 @@
+﻿@model Tuple<IEnumerable<HandmadeShop.Models.Answer>, int?, int, bool>
+
+@{
+    var answers = Model.Item1;
+    var parentId = Model.Item2;
+    var margin = Model.Item3;
+    var isLoggedIn = Model.Item4;
+    var children = answers.Where(a => a.ParentAnswerId == parentId).OrderBy(a => a.CreatedAt).ToList();
+}
+
+@foreach (var ans in children)
+{
+    <div class="answer-thread-item">
+        <div class="answer-avatar">
+            @if (!string.IsNullOrEmpty(ans.User?.ProfileImageUrl))
+            {
+                <img src="@ans.User.ProfileImageUrl" alt="avatar" />
+            }
+            else
+            {
+                @ans.User?.FullName?.Substring(0, 1).ToUpper()
+            }
+        </div>
+        <div class="answer-content">
+            <div class="answer-header">
+                <strong class="answer-username">@ans.User?.FullName</strong>
+                <span class="answer-time">@ans.CreatedAt?.ToString("HH:mm dd/MM")</span>
+            </div>
+            <div class="answer-text">@ans.Content</div>
+            @if (isLoggedIn)
+            {
+                <div class="chat-reply-section">
+                    <button type="button" class="answer-reply-btn" onclick="toggleReplyForm('answer-@ans.Id')">Phản hồi</button>
+                    <form asp-action="Reply" method="post" class="answer-reply-form" id="reply-form-answer-@ans.Id">
+                        <input type="hidden" name="questionId" value="@ans.QuestionId" />
+                        <input type="hidden" name="parentAnswerId" value="@ans.Id" />
+                        <div class="chat-reply-form-container">
+                            <input type="text" name="content" class="form-control answer-reply-input" placeholder="Nhập phản hồi..." required />
+                            <button type="submit" class="answer-reply-submit">Gửi</button>
+                        </div>
+                    </form>
+                </div>
+            }
+            @if (answers.Any(a => a.ParentAnswerId == ans.Id))
+            {
+                <div class="chat-answers-section">
+                    <button type="button" class="answer-replies-toggle" onclick="toggleAnswers('child-answers-@ans.Id')">Xem phản hồi (@answers.Count(a => a.ParentAnswerId == ans.Id))</button>
+                    <div id="child-answers-@ans.Id" class="answer-replies">
+                        @await Html.PartialAsync("_AnswerThread", Tuple.Create(answers, (int?)ans.Id, margin + 15, isLoggedIn))
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

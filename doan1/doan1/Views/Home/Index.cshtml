@@ -1,0 +1,1532 @@
+﻿@{
+    ViewData["Title"] = "Dashboard - HandmadeShop";
+    ViewBag.ContainerClass = "container-fluid";
+}
+
+<div class="dashboard-container">
+    <!-- Phần tiêu đề -->
+    <div class="welcome-section">
+        <div class="welcome-card">
+            <div class="welcome-content">
+                <div class="welcome-icon">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h1 class="welcome-title">HandmadeShop Admin</h1>
+                <p class="welcome-subtitle">Hệ thống quản lý cửa hàng thủ công chuyên nghiệp</p>
+                <div class="welcome-time">
+                    <i class="far fa-clock"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            <div class="welcome-avatar">
+                <div class="avatar-circle">
+                    <i class="fas fa-user"></i>
+                </div>
+                <span class="user-name">@User.FindFirst("FullName")?.Value</span>
+                <span class="user-role">@User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thẻ thống kê -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon orders">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalOrders">--</div>
+                <div class="stat-label">Đơn hàng tháng này</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon revenue">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalRevenue">--</div>
+                <div class="stat-label">Doanh thu tháng này</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon products">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalProducts">--</div>
+                <div class="stat-label">Tổng sản phẩm</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon users">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalUsers">--</div>
+                <div class="stat-label">Khách hàng</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Các thao tác nhanh -->
+    <div class="actions-section">
+        <h2 class="section-title">
+            <i class="fas fa-bolt"></i>
+            Thao tác nhanh
+        </h2>
+        <div class="actions-grid">
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Users" asp-action="Index" class="action-card users">
+                    <div class="action-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="action-content">
+                        <h3>Quản lý khách hàng</h3>
+                        <p>Xem, thêm, sửa khách hàng</p>
+                    </div>
+                    <div class="action-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+            }
+            
+            <a asp-controller="Products" asp-action="Index" class="action-card products">
+                <div class="action-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Quản lý sản phẩm</h3>
+                    <p>Thêm, chỉnh sửa sản phẩm</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a asp-controller="Orders" asp-action="Index" class="action-card orders">
+                <div class="action-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Quản lý đơn hàng</h3>
+                    <p>Xử lý đơn hàng</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a asp-controller="Categories" asp-action="Index" class="action-card categories">
+                <div class="action-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Quản lý danh mục</h3>
+                    <p>Phân loại sản phẩm</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a asp-controller="Vouchers" asp-action="Index" class="action-card vouchers">
+                <div class="action-icon">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Quản lý voucher</h3>
+                    <p>Tạo mã giảm giá</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a asp-controller="Questions" asp-action="Index" class="action-card questions">
+                <div class="action-icon">
+                    <i class="fas fa-question-circle"></i>
+                </div>
+                <div class="action-content">
+                    <h3>Câu hỏi khách hàng</h3>
+                    <p>Trả lời thắc mắc</p>
+                </div>
+                <div class="action-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Nội dung chính -->
+    <div class="main-content">
+        <div class="content-left">
+            <!-- Đơn hàng gần đây -->
+            <div class="glass-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-clock"></i>
+                        Đơn hàng cần xử lý
+                    </h3>
+                    <span class="badge">6 đơn hàng</span>
+                </div>
+                <div class="card-body">
+                    <div id="pendingOrders" class="table-container">
+                        <!-- Đơn hàng chờ xử lý sẽ được tải ở đây -->
+                        <div class="loading-state">
+                            <div class="spinner">
+                                <div class="spinner-ring"></div>
+                            </div>
+                            <span>Đang tải...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-right">
+            <!-- Thông báo -->
+            <div class="glass-card alert-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cảnh báo
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert-item warning">
+                        <div class="alert-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Sản phẩm sắp hết hàng</h4>
+                            <div id="lowStockProducts">Đang kiểm tra...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert-item info">
+                        <div class="alert-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Voucher sắp hết hạn</h4>
+                            <div id="expiringVouchers">Đang kiểm tra...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin hệ thống -->
+            <div class="glass-card system-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Thông tin hệ thống
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="system-info">
+                        <div class="info-item">
+                            <span class="label">Phiên bản</span>
+                            <span class="value">1.0.0</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Cập nhật lần cuối</span>
+                            <span class="value">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Trạng thái</span>
+                            <span class="status active">Hoạt động</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* CSS Variables */
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            --shadow-neumorphism-inset: inset 20px 20px 60px #bebebe, inset -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .dashboard-container {
+            padding: 2rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 35px;
+            padding: 3rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.37),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 50%, 
+                rgba(0, 102, 204, 0.05) 100%);
+            border-radius: 35px;
+            pointer-events: none;
+        }
+
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .welcome-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 20px 60px rgba(31, 38, 135, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .welcome-card:hover::after {
+            opacity: 1;
+        }
+
+        .welcome-content {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .welcome-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(0, 102, 204, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.7;
+            border-radius: 28px;
+        }
+
+        .welcome-icon i {
+            font-size: 2.8rem;
+            color: white;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .welcome-icon:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 12px 40px rgba(31, 38, 135, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .welcome-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, 
+                var(--primary-blue) 0%, 
+                var(--ocean-blue) 50%, 
+                var(--sky-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 4px rgba(0, 102, 204, 0.1));
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3rem;
+            color: rgba(108, 117, 125, 0.9);
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .welcome-time {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 4px 16px rgba(31, 38, 135, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            color: var(--primary-blue);
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: fit-content;
+        }
+
+        .welcome-time:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(31, 38, 135, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .welcome-time i {
+            font-size: 1.1rem;
+            color: var(--ocean-blue);
+        }
+
+        .welcome-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .avatar-circle {
+            width: 95px;
+            height: 95px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.25) 0%, 
+                rgba(0, 102, 204, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-circle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-secondary);
+            opacity: 0.8;
+            border-radius: 50%;
+        }
+
+        .avatar-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 12px 40px rgba(31, 38, 135, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+
+        .avatar-circle i {
+            font-size: 2.2rem;
+            color: white;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+            margin-bottom: 0.5rem;
+        }
+
+        .user-role {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            color: var(--primary-blue);
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 
+                0 4px 16px rgba(31, 38, 135, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .user-role:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 20px rgba(31, 38, 135, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-icon.orders {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.revenue {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon.products {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-icon.users {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .stat-trend.positive {
+            color: #10b981;
+        }
+
+        .stat-trend.neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Actions Section */
+        .actions-section {
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-primary);
+        }
+
+        .section-title i {
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-card.users .action-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .action-card.products .action-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .action-card.orders .action-icon {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .action-card.categories .action-icon {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .action-card.vouchers .action-icon {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .action-card.questions .action-icon {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        .action-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-content h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .action-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .action-arrow {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-card:hover .action-arrow {
+            transform: translateX(5px);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+        }
+
+        .glass-card .badge {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            position: relative;
+            width: 40px;
+            height: 40px;
+        }
+
+        .spinner-ring {
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(102, 126, 234, 0.2);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Alert Cards */
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .alert-item.warning {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .alert-item.info {
+            background: rgba(13, 202, 240, 0.1);
+            border: 1px solid rgba(13, 202, 240, 0.3);
+        }
+
+        .alert-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .alert-item.warning .alert-icon {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+        }
+
+        .alert-item.info .alert-icon {
+            background: linear-gradient(135deg, #2196f3 0%, #21cbf3 100%);
+        }
+
+        .alert-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .alert-content div {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* System Info */
+        .system-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item .label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .info-item .value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .welcome-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Table Styles */
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table-container th,
+        .table-container td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .table-container th {
+            font-weight: 600;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .table-container td {
+            color: var(--text-secondary);
+        }
+
+        .table-container .btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .table-container .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Biến URL
+        const urlPaths = {
+            ordersDetails: '@Url.Action("Details", "Orders")',
+            ordersIndex: '@Url.Action("Index", "Orders")',
+            productsIndex: '@Url.Action("Index", "Products")',
+            vouchersIndex: '@Url.Action("Index", "Vouchers")'
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Khởi tạo đồng hồ thời gian thực
+            updateTime();
+            setInterval(updateTime, 1000);
+            
+            // Tải dữ liệu dashboard
+            loadDashboardStats();
+            loadPendingOrders();
+            loadAlerts();
+            
+            // Thêm hiệu ứng cuộn mượt
+            addSmoothScrolling();
+        });
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            const dateString = now.toLocaleDateString('vi-VN', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.innerHTML = `${timeString} - ${dateString}`;
+            }
+        }
+
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/Home/GetDashboardStats');
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Hiệu ứng số động
+                animateNumber('totalOrders', data.totalOrders);
+                animateNumber('totalProducts', data.totalProducts);
+                animateNumber('totalUsers', data.totalUsers);
+                
+                // Định dạng doanh thu với hiệu ứng
+                const revenueElement = document.getElementById('totalRevenue');
+                if (revenueElement) {
+                    animateRevenue(revenueElement, data.totalRevenue);
+                }
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                // Thiết lập giá trị dự phòng
+                document.getElementById('totalOrders').textContent = '@ViewBag.TotalOrdersThisMonth';
+                document.getElementById('totalRevenue').textContent = 
+                    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(@ViewBag.TotalRevenueThisMonth);
+                document.getElementById('totalProducts').textContent = '@ViewBag.TotalProducts';
+                document.getElementById('totalUsers').textContent = '@ViewBag.TotalUsers';
+            }
+        }
+
+        function animateNumber(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            const duration = 2000;
+            const startValue = 0;
+            const startTime = performance.now();
+            
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Hàm easing
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
+                
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+            
+            requestAnimationFrame(updateNumber);
+        }
+
+        function animateRevenue(element, targetValue) {
+            const duration = 2000;
+            const startValue = 0;
+            const startTime = performance.now();
+            
+            function updateRevenue(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
+                
+                element.textContent = new Intl.NumberFormat('vi-VN', { 
+                    style: 'currency', 
+                    currency: 'VND' 
+                }).format(currentValue);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateRevenue);
+                }
+            }
+            
+            requestAnimationFrame(updateRevenue);
+        }
+
+        async function loadPendingOrders() {
+            try {
+                const response = await fetch('/Home/GetPendingOrders');
+                const orders = await response.json();
+                
+                if (orders.error) {
+                    throw new Error(orders.error);
+                }
+                
+                const container = document.getElementById('pendingOrders');
+                
+                if (orders.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h4>Tuyệt vời!</h4>
+                            <p>Không có đơn hàng chờ xử lý</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let tableHtml = `
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Đơn hàng</th>
+                                <th>Khách hàng</th>
+                                <th>Giá trị</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                orders.forEach((order, index) => {
+                    tableHtml += `
+                        <tr style="animation-delay: ${index * 0.1}s" class="fade-in-row">
+                            <td><strong>#${order.id}</strong></td>
+                            <td>${order.customerName}</td>
+                            <td><span class="amount">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}</span></td>
+                            <td><span class="status pending">Chờ xử lý</span></td>
+                            <td>
+                                <a href="${urlPaths.ordersDetails}/${order.id}" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += `
+                        </tbody>
+                    </table>
+                    <div class="table-footer">
+                        <a href="${urlPaths.ordersIndex}" class="view-all-btn">
+                            <span>Xem tất cả đơn hàng</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                `;
+                
+                container.innerHTML = tableHtml;
+                
+            } catch (error) {
+                console.error('Error loading pending orders:', error);
+                document.getElementById('pendingOrders').innerHTML = `
+                    <div class="error-state">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p>Không thể tải đơn hàng</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadAlerts() {
+            try {
+                // Tải sản phẩm sắp hết hàng với giao diện nâng cao
+                const lowStockResponse = await fetch('/Home/GetLowStockProducts');
+                const lowStockProducts = await lowStockResponse.json();
+                
+                const lowStockElement = document.getElementById('lowStockProducts');
+                
+                if (lowStockProducts.error) {
+                    lowStockElement.innerHTML = '<span class="text-muted">Không thể tải thông tin</span>';
+                } else if (lowStockProducts.length === 0) {
+                    lowStockElement.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Tất cả sản phẩm đều còn hàng</span>';
+                } else {
+                    let lowStockHtml = '<div class="alert-list">';
+                    lowStockProducts.forEach(product => {
+                        lowStockHtml += `
+                            <div class="alert-item-small">
+                                <span class="product-name">${product.name}</span>
+                                <span class="stock-count">còn ${product.stock}</span>
+                            </div>
+                        `;
+                    });
+                    lowStockHtml += `</div><a href="${urlPaths.productsIndex}" class="alert-btn warning">Xem chi tiết</a>`;
+                    lowStockElement.innerHTML = lowStockHtml;
+                }
+
+                // Tải voucher sắp hết hạn với giao diện nâng cao
+                const vouchersResponse = await fetch('/Home/GetExpiringVouchers');
+                const expiringVouchers = await vouchersResponse.json();
+                
+                const vouchersElement = document.getElementById('expiringVouchers');
+                
+                if (expiringVouchers.error) {
+                    vouchersElement.innerHTML = '<span class="text-muted">Không thể tải thông tin</span>';
+                } else if (expiringVouchers.length === 0) {
+                    vouchersElement.innerHTML = '<span class="text-success"><i class="fas fa-check"></i> Không có voucher sắp hết hạn</span>';
+                } else {
+                    let vouchersHtml = '<div class="alert-list">';
+                    expiringVouchers.forEach(voucher => {
+                        const expiryDate = new Date(voucher.expiryDate).toLocaleDateString('vi-VN');
+                        vouchersHtml += `
+                            <div class="alert-item-small">
+                                <span class="voucher-code">${voucher.code}</span>
+                                <span class="expiry-date">hết hạn ${expiryDate}</span>
+                            </div>
+                        `;
+                    });
+                    vouchersHtml += `</div><a href="${urlPaths.vouchersIndex}" class="alert-btn info">Xem chi tiết</a>`;
+                    vouchersElement.innerHTML = vouchersHtml;
+                }
+                
+            } catch (error) {
+                console.error('Error loading alerts:', error);
+                document.getElementById('lowStockProducts').innerHTML = '<span class="text-muted">Không thể tải thông tin</span>';
+                document.getElementById('expiringVouchers').innerHTML = '<span class="text-muted">Không thể tải thông tin</span>';
+            }
+        }
+
+        function addSmoothScrolling() {
+            // Thêm intersection observer cho hiệu ứng
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                    }
+                });
+            }, observerOptions);
+            
+            // Theo dõi tất cả các thẻ
+            document.querySelectorAll('.stat-card, .action-card, .glass-card').forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+        // Add custom styles for enhanced UI elements
+        const additionalStyles = `
+            <style>
+                .empty-state, .error-state {
+                    text-align: center;
+                    padding: 3rem 2rem;
+                    color: var(--text-secondary);
+                }
+                
+                .empty-icon, .error-icon {
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    color: var(--primary-blue);
+                }
+                
+                .error-icon {
+                    color: #ef4444;
+                }
+                
+                .empty-state h4 {
+                    font-size: 1.5rem;
+                    font-weight: 600;
+                    margin-bottom: 0.5rem;
+                    color: var(--text-primary);
+                }
+                
+                .modern-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 1rem;
+                }
+                
+                .modern-table th,
+                .modern-table td {
+                    padding: 1rem;
+                    text-align: left;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                }
+                
+                .modern-table th {
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    background: rgba(255, 255, 255, 0.5);
+                    font-size: 0.9rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+                
+                .fade-in-row {
+                    animation: fadeInUp 0.6s ease forwards;
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                
+                @@keyframes fadeInUp {
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                
+                .amount {
+                    font-weight: 600;
+                    color: var(--primary-blue);
+                }
+                
+                .status {
+                    padding: 0.3rem 0.8rem;
+                    border-radius: 12px;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                }
+                
+                .status.pending {
+                    background: rgba(255, 193, 7, 0.2);
+                    color: #f59e0b;
+                    border: 1px solid rgba(255, 193, 7, 0.3);
+                }
+                
+                .table-footer {
+                    text-align: center;
+                    padding: 1.5rem;
+                    border-top: 1px solid rgba(255, 255, 255, 0.3);
+                }
+                
+                .view-all-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    background: var(--gradient-primary);
+                    color: white;
+                    padding: 0.8rem 1.5rem;
+                    border-radius: 15px;
+                    text-decoration: none;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    box-shadow: var(--shadow-light);
+                }
+                
+                .view-all-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: var(--shadow-medium);
+                    color: white;
+                    text-decoration: none;
+                }
+                
+                .alert-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    margin-bottom: 1rem;
+                }
+                
+                .alert-item-small {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.5rem 0;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                }
+                
+                .alert-item-small:last-child {
+                    border-bottom: none;
+                }
+                
+                .product-name, .voucher-code {
+                    font-weight: 500;
+                    color: var(--text-primary);
+                }
+                
+                .stock-count, .expiry-date {
+                    font-size: 0.85rem;
+                    color: var(--text-secondary);
+                }
+                
+                .alert-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.5rem 1rem;
+                    border-radius: 10px;
+                    text-decoration: none;
+                    font-size: 0.85rem;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+                
+                .alert-btn.warning {
+                    background: rgba(255, 193, 7, 0.2);
+                    color: #f59e0b;
+                    border: 1px solid rgba(255, 193, 7, 0.3);
+                }
+                
+                .alert-btn.info {
+                    background: rgba(13, 202, 240, 0.2);
+                    color: #0ea5e9;
+                    border: 1px solid rgba(13, 202, 240, 0.3);
+                }
+                
+                .alert-btn:hover {
+                    transform: translateY(-1px);
+                    text-decoration: none;
+                }
+                
+                .animate-in {
+                    animation: slideInUp 0.6s ease forwards;
+                }
+                
+                @@keyframes slideInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(30px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            </style>
+        `;
+        
+        document.head.insertAdjacentHTML('beforeend', additionalStyles);
+    </script>
+}

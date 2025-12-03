@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HandmadeShop</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-top">
+            <!-- Logo -->
+            <div class="logo">
+                <a href="@Url.Action("Index", "Home")">
+                    <img src="@Url.Content("~/images/Logo_HandmadeShop.svg")" alt="HandmadeShop Logo" />
+                </a>
+            </div>
+
+            <!-- Search Bar -->
+            <form asp-controller="Category" asp-action="Category" method="get" class="header-search-bar">
+                <select name="categoryId">
+                    <option value="">Tất cả danh mục</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.Id">@category.CategoriesName</option>
+                        }
+                    }
+                </select>
+                <input name="keyword" placeholder="Tìm kiếm sản phẩm..." />
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i>
+                </button>
+            </form>
+
+            <!-- Actions -->
+            <div class="header-actions">
+                <!-- Cart -->
+                <div class="header-cart dropdown">
+                    <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-cart-fill"></i> <!-- Icon giỏ hàng từ Bootstrap Icons -->
+                        <span class="cart-count">@ViewBag.CartCount</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end cart-dropdown">
+                        @if (ViewBag.CartItems != null && ViewBag.CartItems.Count > 0)
+                        {
+                            <ul class="cart-items">
+                                @foreach (var item in ViewBag.CartItems)
+                                {
+                                    HandmadeShop.Models.ProductVariation? variation = null;
+                                    decimal price = 0;
+                                    decimal discountRate = item.Product.DiscountedPrice ?? 0;
+                                    if (item.VariantId != null && Convert.ToInt32(item.VariantId) != 0)
+                                    {
+                                        var variations = item.Product.ProductVariations as IEnumerable<HandmadeShop.Models.ProductVariation>;
+                                        int variantId = Convert.ToInt32(item.VariantId);
+                                        variation = variations != null ? variations.FirstOrDefault(v => v.Id == variantId) : null;
+                                        price = variation != null
+                                            ? (discountRate > 0 ? variation.Price * (1 - discountRate) : variation.Price)
+                                            : (discountRate > 0 ? (item.Product.Price ?? 0) * (1 - discountRate) : (item.Product.Price ?? 0));
+                                    }
+                                    else
+                                    {
+                                        price = (discountRate > 0) ? (item.Product.Price ?? 0) * (1 - discountRate) : (item.Product.Price ?? 0);
+                                    }
+                                    <li class="cart-item">
+                                        <img src="@item.Product.ImageUrl" alt="@item.Product.Name" class="cart-item-img" />
+                                        <div class="cart-item-info">
+                                            <span class="cart-item-name">@item.Product.Name</span>
+                                            <span class="cart-item-price">@price.ToString("N0") VNĐ</span>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                            <div class="cart-total">
+                                <!-- Tổng tiền đã bị ẩn -->
+                            </div>
+                            <a href="@Url.Action("Shopping_cart", "Shopping_cart")" class="btn btn-primary btn-sm">Xem giỏ hàng</a>
+                        }
+                        else
+                        {
+                            <p class="text-center">Giỏ hàng trống</p>
+                        }
+                    </div>
+                </div>
+
+                <!-- User -->
+                <div class="header-user dropdown">
+                    @if (ViewBag.UserAvatar != null)
+                    {
+                        <a href="@Url.Action("Userpage", "User")" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="@ViewBag.UserAvatar" alt="User Avatar" class="user-avatar" />
+                        </a>
+                        <span class="user-name">@ViewBag.FullName</span> <!-- Hiển thị tên người dùng dưới avatar -->
+                        <div class="dropdown-menu dropdown-menu-end user-dropdown">
+                            <a href="@Url.Action("Userpage", "User")" class="dropdown-item">Tài khoản</a>
+                            <a href="@Url.Action("Purchase", "User")" class="dropdown-item">Đơn mua</a> <!-- Thêm dòng này -->
+                            <form method="post" action="@Url.Action("Logout", "User")">
+                                <button type="submit" class="dropdown-item">Đăng xuất</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="@Url.Action("Login", "User")" class="btn btn-outline-primary">Đăng nhập</a>
+                    }
+                </div>
+            </div>
+        </div>
+        <nav class="navbar-custom">
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Home" ? "active" : "")" href="@Url.Action("Index", "Home")">TRANG CHỦ</a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Category" ? "active" : "")" href="@Url.Action("Category", "Category")">TẤT CẢ SẢN PHẨM</a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Blog" ? "active" : "")" href="@Url.Action("Blog", "Blog")">TIN TỨC</a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "About" ? "active" : "")" href="@Url.Action("About", "About")">GIỚI THIỆU</a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Terms_conditions" ? "active" : "")" href="@Url.Action("Terms_conditions", "Terms_conditions")">ĐIỀU KHOẢN</a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Faq" ? "active" : "")" href="@Url.Action("Faq", "Faq")">CÂU HỎI</a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"].ToString() == "Contract" ? "active" : "")" href="@Url.Action("Contract", "Contract")">LIÊN HỆ</a>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>Liên hệ</h5>
+                    <p>HandmadeShop, 789 Main rd, Anytown, CA 12345 USA</p>
+                    <p>+84 123-4567<br>+84 456-7890</p>
+                    <p>Email: <a href="mailto:handmadeshop@email.com">handmadeshop@email.com</a></p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Dịch vụ khách hàng</h5>
+                    <ul>
+                        <li><a href="#">Tài khoản của tôi</a></li>
+                        <li><a href="#">Lịch sử đơn hàng</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Ưu đãi</a></li>
+                        <li><a href="#">Trung tâm trợ giúp</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Thông tin</h5>
+                    <ul>
+                        <li><a href="#">Về chúng tôi</a></li>
+                        <li><a href="#">Dịch vụ khách hàng</a></li>
+                        <li><a href="#">Công ty</a></li>
+                        <li><a href="#">Nhà đầu tư</a></li>
+                        <li><a href="#">Tìm kiếm nâng cao</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>Hướng dẫn mua hàng</h5>
+                    <ul>
+                        <li><a href="#">Hướng dẫn mua hàng</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Công ty</a></li>
+                        <li><a href="#">Nhà đầu tư</a></li>
+                        <li><a href="#">Liên hệ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const userAvatar = document.querySelector('.header-user .dropdown-toggle');
+    const userDropdown = document.querySelector('.header-user .user-dropdown');
+    if (userAvatar && userDropdown) {
+        userAvatar.addEventListener('mouseenter', function () {
+            userDropdown.classList.add('show');
+        });
+        userAvatar.addEventListener('mouseleave', function () {
+            setTimeout(() => userDropdown.classList.remove('show'), 200);
+        });
+        userDropdown.addEventListener('mouseenter', function () {
+            userDropdown.classList.add('show');
+        });
+        userDropdown.addEventListener('mouseleave', function () {
+            userDropdown.classList.remove('show');
+        });
+    }
+});
+</script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

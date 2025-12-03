@@ -1,0 +1,92 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\images\banners\banner-side.png" />
+    <None Include="wwwroot\images\banners\cat-banner-1.jpg" />
+    <None Include="wwwroot\images\banners\home-banner.jpg" />
+    <None Include="wwwroot\images\banners\home-banner1.jpg" />
+    <None Include="wwwroot\images\banners\home-banner2.jpg" />
+    <None Include="wwwroot\images\banners\LHS-banner.jpg" />
+    <None Include="wwwroot\images\banners\top-menu-banner.jpg" />
+    <None Include="wwwroot\images\blog-post\blog_big_01.jpg" />
+    <None Include="wwwroot\images\blog-post\blog_big_02.jpg" />
+    <None Include="wwwroot\images\blog-post\blog_big_03.jpg" />
+    <None Include="wwwroot\images\blog-post\post1.jpg" />
+    <None Include="wwwroot\images\blog-post\post2.jpg" />
+    <None Include="wwwroot\images\close.png" />
+    <None Include="wwwroot\images\hot-deals\p10.jpg" />
+    <None Include="wwwroot\images\hot-deals\p25.jpg" />
+    <None Include="wwwroot\images\hot-deals\p5.jpg" />
+    <None Include="wwwroot\images\label.png" />
+    <None Include="wwwroot\images\next.png" />
+    <None Include="wwwroot\images\payments\1.png" />
+    <None Include="wwwroot\images\payments\2.png" />
+    <None Include="wwwroot\images\payments\3.png" />
+    <None Include="wwwroot\images\payments\4.png" />
+    <None Include="wwwroot\images\payments\5.png" />
+    <None Include="wwwroot\images\prev.png" />
+    <None Include="wwwroot\images\products\p1.jpg" />
+    <None Include="wwwroot\images\products\p10.jpg" />
+    <None Include="wwwroot\images\products\p11.jpg" />
+    <None Include="wwwroot\images\products\p12.jpg" />
+    <None Include="wwwroot\images\products\p13.jpg" />
+    <None Include="wwwroot\images\products\p14.jpg" />
+    <None Include="wwwroot\images\products\p15.jpg" />
+    <None Include="wwwroot\images\products\p16.jpg" />
+    <None Include="wwwroot\images\products\p17.jpg" />
+    <None Include="wwwroot\images\products\p18.jpg" />
+    <None Include="wwwroot\images\products\p19.jpg" />
+    <None Include="wwwroot\images\products\p2.jpg" />
+    <None Include="wwwroot\images\products\p20.jpg" />
+    <None Include="wwwroot\images\products\p21.jpg" />
+    <None Include="wwwroot\images\products\p22.jpg" />
+    <None Include="wwwroot\images\products\p23.jpg" />
+    <None Include="wwwroot\images\products\p24.jpg" />
+    <None Include="wwwroot\images\products\p25.jpg" />
+    <None Include="wwwroot\images\products\p26.jpg" />
+    <None Include="wwwroot\images\products\p27.jpg" />
+    <None Include="wwwroot\images\products\p28.jpg" />
+    <None Include="wwwroot\images\products\p29.jpg" />
+    <None Include="wwwroot\images\products\p3.jpg" />
+    <None Include="wwwroot\images\products\p30.jpg" />
+    <None Include="wwwroot\images\products\p4.jpg" />
+    <None Include="wwwroot\images\products\p5.jpg" />
+    <None Include="wwwroot\images\products\p6.jpg" />
+    <None Include="wwwroot\images\products\p7.jpg" />
+    <None Include="wwwroot\images\products\p8.jpg" />
+    <None Include="wwwroot\images\products\p9.jpg" />
+    <None Include="wwwroot\images\sliders\01.jpg" />
+    <None Include="wwwroot\images\sliders\02.jpg" />
+    <None Include="wwwroot\images\testimonials\member1.png" />
+    <None Include="wwwroot\images\testimonials\member2.png" />
+    <None Include="wwwroot\images\testimonials\member3.png" />
+    <None Include="wwwroot\images\testimonials\member4.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.17">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+    <PackageReference Include="X.PagedList" Version="8.0.7" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\dist\css\" />
+    <Folder Include="wwwroot\dist\fonts\" />
+    <Folder Include="wwwroot\dist\js\" />
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
+
+</Project>

@@ -1,0 +1,1121 @@
+@model doan1.Models.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+@Html.AntiForgeryToken()
+
+<div class="products-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <h1>Chi tiết sản phẩm</h1>
+                <p>Thông tin đầy đủ về sản phẩm "@Model.Name"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-container">
+        <div class="glass-card product-overview-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-info-circle"></i>
+                    Tổng quan sản phẩm
+                </h3>
+                <div class="product-status">
+                    @if (Model.Stock.HasValue && Model.Stock.Value > 0)
+                    {
+                        <span class="status-badge available">
+                            <i class="fas fa-check-circle"></i>
+                            Có sẵn
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="status-badge unavailable">
+                            <i class="fas fa-times-circle"></i>
+                            Hết hàng
+                        </span>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="product-showcase">
+                    <div class="product-image-large">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 220px; max-height: 220px; object-fit: cover; border-radius: 15px;" />
+                            }
+                            else
+                            {
+                                <div class="image-placeholder"><i class="fa fa-image"></i> No Image</div>
+                            }
+                    </div>
+                    <div class="product-details">
+                        <h2>@Model.Name</h2>
+                        <div class="product-category">
+                            @if (Model.Category != null)
+                            {
+                                <span class="category-tag">
+                                    <i class="fas fa-tag"></i>
+                                    @Model.Category.CategoriesName
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="no-category">Chưa phân loại</span>
+                            }
+                        </div>
+                        <div class="price-section">
+                            @if (Model.Price.HasValue)
+                            {
+                                <div class="current-price">@Model.Price.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</div>
+                            }
+                            @if (Model.OriginalPrice.HasValue && Model.OriginalPrice.Value > 0 && Model.OriginalPrice.Value != Model.Price)
+                            {
+                                <div class="original-price">@Model.OriginalPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</div>
+                                @if (Model.Price.HasValue)
+                                {
+                                    <div class="discount-percent">
+                                        -@Math.Round((1 - (double)Model.Price.Value / (double)Model.OriginalPrice.Value) * 100)%
+                                    </div>
+                                }
+                            }
+                            @if (Model.DiscountedPrice.HasValue && Model.DiscountedPrice.Value > 0)
+                            {
+                                <div class="discounted-price">Giá KM: @Model.DiscountedPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</div>
+                            }
+                        </div>
+                        <div class="stock-info">
+                            @if (Model.Stock.HasValue)
+                            {
+                                @if (Model.Stock.Value > 10)
+                                {
+                                    <span class="stock-badge high">
+                                        <i class="fas fa-check-circle"></i>
+                                        @Model.Stock.Value sản phẩm có sẵn
+                                    </span>
+                                }
+                                else if (Model.Stock.Value > 0)
+                                {
+                                    <span class="stock-badge low">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        Chỉ còn @Model.Stock.Value sản phẩm
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="stock-badge out">
+                                        <i class="fas fa-times-circle"></i>
+                                        Hết hàng
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="stock-badge unknown">
+                                    <i class="fas fa-question-circle"></i>
+                                    Chưa cập nhật tồn kho
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Variations Selection -->
+        <div class="glass-card variations-card" id="variationsCard" style="display: none;">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-palette"></i>
+                    Chọn biến thể sản phẩm
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="variations-selection">
+                    <div id="attributeSelectors"></div>
+                    <div class="selected-variation-info" id="selectedVariationInfo" style="display: none;">
+                        <div class="variation-price">
+                            <span class="price-label">Giá:</span>
+                            <span class="price-value" id="variationPrice"></span>
+                        </div>
+                        <div class="variation-stock">
+                            <span class="stock-label">Còn lại:</span>
+                            <span class="stock-value" id="variationStock"></span>
+                        </div>
+                        <div class="variation-details">
+                            <strong>Thông tin biến thể đã chọn</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card description-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-file-alt"></i>
+                    Mô tả sản phẩm
+                </h3>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="product-description">
+                        @Model.Description
+                    </div>
+                }
+                else
+                {
+                    <div class="no-description">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Chưa có mô tả cho sản phẩm này.</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="glass-card specifications-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-list-ul"></i>
+                    Thông số kỹ thuật
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-hashtag"></i>
+                            Mã sản phẩm
+                        </div>
+                        <div class="spec-value">
+                            #@Model.Id
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-tag"></i>
+                            Danh mục
+                        </div>
+                        <div class="spec-value">
+                            @if (Model.Category != null)
+                            {
+                                @Model.Category.CategoriesName
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa phân loại</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-dollar-sign"></i>
+                            Giá bán
+                        </div>
+                        <div class="spec-value">
+                            @if (Model.Price.HasValue)
+                            {
+                                @Model.Price.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa có giá</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-tags"></i>
+                            Giá gốc
+                        </div>
+                        <div class="spec-value">
+                            @if (Model.OriginalPrice.HasValue && Model.OriginalPrice.Value > 0)
+                            {
+                                @Model.OriginalPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-percent"></i>
+                            Giá khuyến mãi
+                        </div>
+                        <div class="spec-value">
+                            @if (Model.DiscountedPrice.HasValue && Model.DiscountedPrice.Value > 0)
+                            {
+                                @Model.DiscountedPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">
+                            <i class="fas fa-boxes"></i>
+                            Tồn kho
+                        </div>
+                        <div class="spec-value">
+                            @if (Model.Stock.HasValue)
+                            {
+                                <span>@Model.Stock.Value sản phẩm</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa cập nhật</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card actions-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-cogs"></i>
+                    Thao tác
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="action-buttons">
+                    <a asp-action="Index" class="glass-btn secondary large">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Quay lại danh sách</span>
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-btn warning large">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh sửa sản phẩm</span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-btn danger large">
+                        <i class="fas fa-trash"></i>
+                        <span>Xóa sản phẩm</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .products-container {
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .status-badge.available {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .status-badge.unavailable {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+        }
+
+        .product-showcase {
+            display: flex;
+            gap: 3rem;
+            align-items: flex-start;
+        }
+
+        .product-image-large {
+            width: 400px;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+
+        .product-image-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .image-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-details h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .product-category {
+            margin-bottom: 2rem;
+        }
+
+        .category-tag {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .no-category {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .price-section {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .current-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .original-price {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+        }
+
+        .discount-percent {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .discounted-price {
+            font-size: 1.2rem;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .stock-info {
+            margin-bottom: 2rem;
+        }
+
+        .stock-badge {
+            padding: 0.75rem 1.5rem;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .stock-badge.high {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .stock-badge.low {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .stock-badge.out {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+        }
+
+        .stock-badge.unknown {
+            background: linear-gradient(135deg, var(--text-secondary) 0%, #6b7280 100%);
+        }
+
+        .product-description {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.5);
+            padding: 2rem;
+            border-radius: 15px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .no-description {
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 2rem;
+        }
+
+        .no-description i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .spec-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .spec-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .spec-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .spec-label i {
+            color: var(--primary-blue);
+        }
+
+        .spec-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var (--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            justify-content: center;
+        }
+
+        .glass-btn.large {
+            padding: 1.25rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var (--text-secondary);
+        }
+
+        .glass-btn.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+        }
+
+        .glass-btn.warning::before {
+            background: linear-gradient(135deg, #fbbf24 0%, var(--warning) 100%);
+        }
+
+        .glass-btn.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .glass-btn.danger::before {
+            background: linear-gradient(135deg, #f87171 0%, var(--danger) 100%);
+        }
+
+        @@media (max-width: 1200px) {
+            .product-showcase {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .product-image-large {
+                width: 100%;
+                max-width: 400px;
+                height: 300px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .products-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .product-details h2 {
+                font-size: 2rem;
+            }
+
+            .current-price {
+                font-size: 2rem;
+            }
+
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .price-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        
+        /* Variation Selection Styles */
+        .variations-card {
+            border: 2px solid var(--primary-blue);
+        }
+        
+        .variations-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .attribute-selector {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .attribute-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        
+        .attribute-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .option-btn {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 204, 0.1);
+        }
+        
+        .option-btn.selected {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: rgba(200, 200, 200, 0.3);
+        }
+        
+        .selected-variation-info {
+            background: var(--gradient-light);
+            border-radius: 15px;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid var(--success);
+        }
+        
+        .variation-price .price-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+        
+        .variation-stock .stock-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+    </style>
+}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const productId = @Model.Id;
+    let productVariations = [];
+    let availableAttributes = {};
+    let selectedOptions = {};
+    let selectedVariation = null;
+
+    // Load product variations
+    loadProductVariations();
+
+    function loadProductVariations() {
+        fetch(`/api/products/${productId}/variations`)
+        .then(response => response.json())
+        .then(variations => {
+            productVariations = variations;
+            if (variations.length > 0) {
+                setupVariationSelection();
+                document.getElementById('variationsCard').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading variations:', error);
+        });
+    }
+
+    function setupVariationSelection() {
+        // Extract unique attributes from variations
+        availableAttributes = {};
+        productVariations.forEach(variation => {
+            variation.attributes.forEach(attr => {
+                if (!availableAttributes[attr.attributeName]) {
+                    availableAttributes[attr.attributeName] = new Set();
+                }
+                availableAttributes[attr.attributeName].add(attr.optionValue);
+            });
+        });
+
+        // Convert Sets to Arrays
+        Object.keys(availableAttributes).forEach(attrName => {
+            availableAttributes[attrName] = Array.from(availableAttributes[attrName]);
+        });
+
+        // Trường hợp chỉ có 1 variation và không có attribute nào (attributes rỗng)
+        if (productVariations.length === 1 && Object.keys(availableAttributes).length === 0) {
+            selectedVariation = productVariations[0];
+            document.getElementById('attributeSelectors').innerHTML = '<div class="attribute-selector"><em>Biến thể duy nhất</em></div>';
+            showSelectedVariation();
+            return;
+        }
+
+        renderAttributeSelectors();
+
+        // Auto-select nếu mỗi attribute chỉ có đúng 1 option
+        const attrNames = Object.keys(availableAttributes);
+        let autoSelectedAll = true;
+        attrNames.forEach(name => {
+            if (availableAttributes[name].length === 1) {
+                selectedOptions[name] = availableAttributes[name][0];
+            } else {
+                autoSelectedAll = false;
+            }
+        });
+        if (autoSelectedAll && attrNames.length > 0) {
+            // Nếu đã tự chọn hết -> tìm variation
+            checkCompleteSelection();
+            // Đánh dấu nút tương ứng
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                const attr = btn.getAttribute('data-attribute');
+                const val = btn.getAttribute('data-value');
+                if (selectedOptions[attr] === val) btn.classList.add('selected');
+            });
+        }
+    }
+
+    function renderAttributeSelectors() {
+        const container = document.getElementById('attributeSelectors');
+        container.innerHTML = '';
+
+        Object.keys(availableAttributes).forEach(attributeName => {
+            const selectorDiv = document.createElement('div');
+            selectorDiv.className = 'attribute-selector';
+            
+            const label = document.createElement('div');
+            label.className = 'attribute-label';
+            label.textContent = attributeName;
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'attribute-options';
+            
+            availableAttributes[attributeName].forEach(optionValue => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn';
+                optionBtn.textContent = optionValue;
+                optionBtn.setAttribute('data-attribute', attributeName);
+                optionBtn.setAttribute('data-value', optionValue);
+                
+                optionBtn.addEventListener('click', function() {
+                    selectOption(attributeName, optionValue, this);
+                });
+                
+                optionsDiv.appendChild(optionBtn);
+            });
+            
+            selectorDiv.appendChild(label);
+            selectorDiv.appendChild(optionsDiv);
+            container.appendChild(selectorDiv);
+        });
+
+        updateAvailableOptions();
+    }
+
+    function selectOption(attributeName, optionValue, buttonElement) {
+        // Update selected options
+        selectedOptions[attributeName] = optionValue;
+        
+        // Update UI
+        const attributeSelector = buttonElement.closest('.attribute-selector');
+        attributeSelector.querySelectorAll('.option-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        buttonElement.classList.add('selected');
+        
+        // Update available options and check for complete selection
+        updateAvailableOptions();
+        checkCompleteSelection();
+    }
+
+    function updateAvailableOptions() {
+        // Get possible variations based on current selection
+        const possibleVariations = productVariations.filter(variation => {
+            return Object.keys(selectedOptions).every(selectedAttr => {
+                return variation.attributes.some(attr => 
+                    attr.attributeName === selectedAttr && 
+                    attr.optionValue === selectedOptions[selectedAttr]
+                );
+            });
+        });
+
+        // Update button states
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            const attrName = btn.getAttribute('data-attribute');
+            const attrValue = btn.getAttribute('data-value');
+            
+            // Skip if this option is already selected
+            if (selectedOptions[attrName] === attrValue) {
+                btn.disabled = false;
+                return;
+            }
+            
+            // Check if this option is available with current selection
+            const tempSelection = { ...selectedOptions };
+            tempSelection[attrName] = attrValue;
+            
+            const isAvailable = possibleVariations.some(variation => {
+                return Object.keys(tempSelection).every(selectedAttr => {
+                    return variation.attributes.some(attr => 
+                        attr.attributeName === selectedAttr && 
+                        attr.optionValue === tempSelection[selectedAttr]
+                    );
+                });
+            });
+            
+            btn.disabled = !isAvailable;
+        });
+    }
+
+    function checkCompleteSelection() {
+        const requiredAttributes = Object.keys(availableAttributes);
+        const selectedAttributes = Object.keys(selectedOptions);
+        
+        if (requiredAttributes.length === selectedAttributes.length) {
+            // Find the matching variation
+            selectedVariation = productVariations.find(variation => {
+                return requiredAttributes.every(attrName => {
+                    return variation.attributes.some(attr => 
+                        attr.attributeName === attrName && 
+                        attr.optionValue === selectedOptions[attrName]
+                    );
+                });
+            });
+            
+            if (selectedVariation) {
+                showSelectedVariation();
+            }
+        } else {
+            hideSelectedVariation();
+        }
+    }
+
+    function showSelectedVariation() {
+        const infoDiv = document.getElementById('selectedVariationInfo');
+        
+        // Update price and stock
+        document.getElementById('variationPrice').textContent = 
+            selectedVariation.price.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
+        document.getElementById('variationStock').textContent = 
+            selectedVariation.stock + ' sản phẩm';
+        
+        infoDiv.style.display = 'block';
+    }
+
+    function hideSelectedVariation() {
+        document.getElementById('selectedVariationInfo').style.display = 'none';
+    }
+
+    // Initialize page (load variations if exist)
+    loadProductVariations();
+});
+</script>
+</script>

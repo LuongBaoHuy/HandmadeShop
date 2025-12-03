@@ -1,0 +1,124 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/css/style-login.css" />
+    <title>Đăng nhập / Đăng ký</title>
+</head>
+<body>
+    <div class="container">
+        <div class="forms-container">
+            <div class="signin-signup">
+                @* Đăng nhập *@
+                <form asp-action="Login" asp-controller="User" method="post" class="sign-in-form">
+                    <h2 class="title">Đăng nhập</h2>
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" placeholder="Tên đăng nhập" required />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Mật khẩu" required />
+                    </div>
+                    <div class="forgot-password-link" style="text-align: right; margin-bottom: 10px;">
+                        <a asp-action="ForgotPassword" asp-controller="User" class="forgot-link" style="color: #3498db; text-decoration: none; font-size: 0.95em;">
+                            Quên mật khẩu?
+                        </a>
+                    </div>
+                    <style>
+                        .forgot-link:hover {
+                            color: #217dbb;
+                            filter: brightness(0.85);
+                            text-decoration: underline;
+                            transition: filter 0.2s, color 0.2s;
+                        }
+                    </style>
+                    @if (TempData["Message"] != null && TempData["MessageType"]?.ToString() == "error")
+                    {
+                        <div class="alert alert-danger" style="color: red;">@TempData["Message"]</div>
+                    }
+                    @if (Context.Request.Method == "POST" && ViewData.ModelState["LoginError"] != null)
+                    {
+                        <div class="alert alert-danger" style="color: red;">@ViewData.ModelState["LoginError"].Errors[0].ErrorMessage</div>
+                    }
+                    <input type="submit" value="Đăng nhập" class="btn solid" />                    
+                </form>
+                @* Đăng ký *@
+                <form asp-action="Register" asp-controller="User" method="post" class="sign-up-form">
+                    <h2 class="title">Đăng ký</h2>
+                    <div class="input-field">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" placeholder="Tên đăng nhập" required />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Email" required />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-phone"></i>
+                        <input type="text" name="phoneNumber" placeholder="Số điện thoại" required maxlength />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Mật khẩu" required />
+                    </div>
+                    <div class="input-field">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="confirmPassword" placeholder="Nhập lại mật khẩu" required />
+                    </div>                    
+                    @if (ViewData.ModelState["RegisterError"] != null)
+                    {
+                        <div class="alert alert-danger" style="color: red;">@ViewData.ModelState["RegisterError"].Errors[0].ErrorMessage</div>
+                    }
+                    <input type="submit" class="btn" value="Đăng ký" />
+                </form>
+            </div>
+        </div>
+        <div class="panels-container">
+            <div class="panel left-panel">
+                <div class="content">
+                    <h3>Bạn mới đến?</h3>
+                    <p>
+                        Hãy đăng ký tài khoản để trải nghiệm mua sắm tại Handmade Shop!
+                    </p>
+                    <button class="btn transparent" id="sign-up-btn">
+                        Đăng ký
+                    </button>
+                </div>
+                <img src="~/images/login.svg" class="image" alt="" />
+            </div>
+            <div class="panel right-panel">
+                <div class="content">
+                    <h3>Đã có tài khoản?</h3>
+                    <p>
+                        Đăng nhập để tiếp tục mua sắm và quản lý đơn hàng của bạn.
+                    </p>
+                    <button class="btn transparent" id="sign-in-btn">
+                        Đăng nhập
+                    </button>
+                </div>
+                <img src="~/images/reg.svg" class="image" alt="" />
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    const sign_in_btn = document.querySelector("#sign-in-btn");
+    const sign_up_btn = document.querySelector("#sign-up-btn");
+    const container = document.querySelector(".container");
+
+    sign_up_btn.addEventListener("click", () => {
+      container.classList.add("sign-up-mode");
+    });
+
+    sign_in_btn.addEventListener("click", () => {
+      container.classList.remove("sign-up-mode");
+    });
+</script>

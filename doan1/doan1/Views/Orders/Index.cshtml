@@ -1,0 +1,1612 @@
+@using System.Web
+@model IEnumerable<doan1.Models.Order>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<div class="orders-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h1>Quản lý đơn hàng</h1>
+                <p>Theo dõi và xử lý đơn hàng trong hệ thống</p>
+                <div class="workflow-info">
+                    <span class="workflow-step pending">
+                        <i class="fas fa-clock"></i>
+                        Chờ xử lý
+                    </span>
+                    <i class="fas fa-arrow-right"></i>
+                    <span class="workflow-step confirmed">
+                        <i class="fas fa-check-circle"></i>
+                        Đã xác nhận
+                    </span>
+                    <i class="fas fa-arrow-right"></i>
+                    <span class="workflow-step completed">
+                        <i class="fas fa-star"></i>
+                        Hoàn thành
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hộp thoại popup -->
+    <div id="popup-overlay" class="popup-overlay">
+        <div id="popup-container" class="popup-container">
+            <div class="popup-header">
+                <div class="popup-icon">
+                    <i id="popup-icon" class="fas fa-check-circle"></i>
+                </div>
+                <h3 id="popup-title">Thông báo</h3>
+                <button type="button" class="popup-close" onclick="closePopup()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="popup-body">
+                <p id="popup-message"></p>
+            </div>
+            <div class="popup-footer">
+                <button type="button" class="glass-btn primary" onclick="closePopup()">
+                    <i class="fas fa-check"></i>
+                    <span>Đã hiểu</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu mẫu tìm kiếm và lọc -->
+    <div class="glass-card search-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-search"></i>
+                Tìm kiếm và lọc đơn hàng
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="search-form" id="searchForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="searchTerm" class="form-label">Từ khóa tìm kiếm</label>
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <input type="text" class="glass-input" id="searchTerm" name="searchTerm" 
+                                   value="@ViewBag.SearchTerm" placeholder="ID, tên, email, SĐT, địa chỉ...">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="status" class="form-label">Trạng thái</label>
+                        <select class="glass-select" id="status" name="status">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Pending" selected="@(ViewBag.Status == "Pending")">Chờ xử lý</option>
+                            <option value="Confirmed" selected="@(ViewBag.Status == "Confirmed")">Đã xác nhận</option>
+                            <option value="Completed" selected="@(ViewBag.Status == "Completed")">Hoàn thành</option>
+                        </select>
+                    </div>
+
+                    <!-- NEW: Lọc theo Thanh toán -->
+                    <div class="form-group">
+                        <label for="paymentStatus" class="form-label">Thanh toán</label>
+                        <select class="glass-select" id="paymentStatus" name="paymentStatus">
+                            <option value="">Tất cả</option>
+                            <option value="paid" selected="@(ViewBag.PaymentStatus == "paid")">Đã thanh toán</option>
+                            <option value="unpaid" selected="@(ViewBag.PaymentStatus == "unpaid")">Chưa thanh toán</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="priceRange" class="form-label">Khoảng giá</label>
+                        <select class="glass-select" id="priceRange" name="priceRange">
+                            <option value="">Tất cả giá</option>
+                            <option value="under-500k" selected="@(ViewBag.PriceRange == "under-500k")">Dưới 500K</option>
+                            <option value="500k-1m" selected="@(ViewBag.PriceRange == "500k-1m")">500K - 1M</option>
+                            <option value="1m-5m" selected="@(ViewBag.PriceRange == "1m-5m")">1M - 5M</option>
+                            <option value="over-5m" selected="@(ViewBag.PriceRange == "over-5m")">Trên 5M</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortBy" class="form-label">Sắp xếp theo</label>
+                        <select class="glass-select" id="sortBy" name="sortBy">
+                            <option value="createdat" selected="@(ViewBag.SortBy == "createdat")">Ngày tạo</option>
+                            <option value="id" selected="@(ViewBag.SortBy == "id")">ID</option>
+                            <option value="totalprice" selected="@(ViewBag.SortBy == "totalprice")">Tổng tiền</option>
+                            <option value="user" selected="@(ViewBag.SortBy == "user")">Khách hàng</option>
+                            <option value="status" selected="@(ViewBag.SortBy == "status")">Trạng thái</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortOrder" class="form-label">Thứ tự</label>
+                        <select class="glass-select" id="sortOrder" name="sortOrder">
+                            <option value="desc" selected="@(ViewBag.SortOrder == "desc")">Giảm dần</option>
+                            <option value="asc" selected="@(ViewBag.SortOrder == "asc")">Tăng dần</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fromDate" class="form-label">Từ ngày</label>
+                        <input type="date" class="glass-input" id="fromDate" name="fromDate" 
+                               value="@(ViewBag.FromDate?.ToString("yyyy-MM-dd"))">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="toDate" class="form-label">Đến ngày</label>
+                        <input type="date" class="glass-input" id="toDate" name="toDate" 
+                               value="@(ViewBag.ToDate?.ToString("yyyy-MM-dd"))">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="glass-btn primary">
+                            <i class="fas fa-search"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
+                        <a href="@Url.Action("Index")" class="glass-btn secondary">
+                            <i class="fas fa-undo"></i>
+                            <span>Đặt lại</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="glass-card actions-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-cogs"></i>
+                Thao tác
+            </h3>
+        </div>
+        <div class="card-body">
+            <div class="main-actions">
+                <div class="info-message">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Đơn hàng được tạo bởi khách hàng từ giao diện mua sắm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="glass-card data-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-list"></i>
+                Danh sách đơn hàng
+            </h3>
+            @if (ViewBag.TotalResults != null && ViewBag.TotalResults > 0)
+            {
+                <span class="glass-badge">@ViewBag.TotalResults kết quả</span>
+            }
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                @if (Model.Any())
+                {
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Khách hàng</th>
+                                <th>Thông tin giao hàng</th>
+                                <th>Tổng tiền</th>
+                                <!-- NEW: Cột Thanh toán -->
+                                <th>Thanh toán</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Voucher</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="order-id">#@item.Id</span>
+                                    </td>
+                                    <td>
+                                        <div class="customer-info">
+                                            @if (item.User != null)
+                                            {
+                                                <div class="customer-name">
+                                                    <i class="fas fa-user"></i>
+                                                    @item.User.FullName
+                                                </div>
+                                                <div class="customer-email">@item.User.Email</div>
+                                            }
+                                            else
+                                            {
+                                                <span class="no-customer">Không xác định</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="shipping-info">
+                                            @if (!string.IsNullOrEmpty(item.ShippingName))
+                                            {
+                                                <div class="shipping-name">
+                                                    <i class="fas fa-user"></i>
+                                                    @item.ShippingName
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(item.ShippingPhone))
+                                                {
+                                                    <div class="shipping-phone">
+                                                        <i class="fas fa-phone"></i>
+                                                        @item.ShippingPhone
+                                                    </div>
+                                                }
+                                                @if (!string.IsNullOrEmpty(item.ShippingAddress))
+                                                {
+                                                    <div class="shipping-address">
+                                                        <i class="fas fa-map-marker-alt"></i>
+                                                        @item.ShippingAddress
+                                                    </div>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="no-shipping">Chưa có thông tin</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="price-badge">
+                                            @item.TotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))
+                                        </span>
+                                    </td>
+
+                                    <!-- NEW: Ô hiển thị Thanh toán -->
+                                    <td>
+                                        @if (item.IsPaid == true)
+                                        {
+                                            <span class="payment-badge paid">
+                                                <i class="fas fa-receipt"></i>
+                                                Đã thanh toán
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="payment-badge unpaid">
+                                                <i class="fas fa-money-bill"></i>
+                                                Chưa thanh toán
+                                            </span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case "Pending":
+                                                <span class="status-badge pending">
+                                                    <i class="fas fa-clock"></i>
+                                                    Chờ xử lý
+                                                </span>
+                                                break;
+                                            case "Confirmed":
+                                                <span class="status-badge confirmed">
+                                                    <i class="fas fa-check-circle"></i>
+                                                    Đã xác nhận
+                                                </span>
+                                                break;
+                                            case "Completed":
+                                                <span class="status-badge completed">
+                                                    <i class="fas fa-star"></i>
+                                                    Hoàn thành
+                                                </span>
+                                                break;
+                                            default:
+                                                <span class="status-badge unknown">@item.Status</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="date-info">
+                                            @if (item.CreatedAt.HasValue)
+                                            {
+                                                <div class="date">@item.CreatedAt.Value.ToString("dd/MM/yyyy")</div>
+                                                <div class="time">@item.CreatedAt.Value.ToString("HH:mm")</div>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (item.Voucher != null)
+                                        {
+                                            <span class="voucher-badge">
+                                                <i class="fas fa-ticket-alt"></i>
+                                                Có voucher
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="no-voucher">Không có</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="glass-btn-sm info" title="Chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="glass-btn-sm warning" title="Sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            
+                                            @if (item.Status == "Pending")
+                                            {
+                                                <form method="post" asp-action="AdminConfirm" asp-route-id="@item.Id" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="button" class="glass-btn-sm success confirm-btn" 
+                                                            data-action="AdminConfirm" data-id="@item.Id" 
+                                                            data-message="Xác nhận đơn hàng này và chuyển sang trạng thái 'Đã xác nhận'?" title="Admin xác nhận đơn hàng">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            
+                                            @if (item.Status == "Confirmed")
+                                            {
+                                                <span class="glass-btn-sm secondary disabled" title="Chỉ khách hàng mới có thể xác nhận đã nhận hàng">
+                                                    <i class="fas fa-user-check"></i>
+                                                    Chờ khách hàng
+                                                </span>
+                                            }
+                                            
+                                            @if (item.Status == "Completed")
+                                            {
+                                                <a href="#" class="glass-btn-sm rating" title="Đánh giá sản phẩm">
+                                                    <i class="fas fa-star"></i>
+                                                </a>
+                                            }
+                                            
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="glass-btn-sm danger" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h4>Không tìm thấy đơn hàng nào</h4>
+                        <p>Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc.</p>
+                        <a href="@Url.Action("Index")" class="glass-btn primary">
+                            <i class="fas fa-undo"></i>
+                            <span>Xem tất cả đơn hàng</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* CSS Variables */
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .orders-container {
+            padding: 2rem 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .workflow-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .workflow-step {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .workflow-step.pending {
+            color: var(--warning);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .workflow-step.confirmed {
+            color: var(--info);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .workflow-step.completed {
+            color: var(--success);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .workflow-info .fas.fa-arrow-right {
+            color: var(--text-secondary);
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Actions Card */
+        .actions-card {
+            margin-bottom: 2rem;
+        }
+
+        .main-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+
+        .info-message {
+            background: linear-gradient(135deg, var(--light-blue) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 2px solid var(--info);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            width: 100%;
+        }
+
+        .info-message i {
+            font-size: 1.5rem;
+            color: var(--info);
+        }
+
+        /* Glass Alerts */
+        .glass-alert {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-alert.success {
+            border-left: 4px solid var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .glass-alert.error {
+            border-left: 4px solid var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .glass-alert .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .glass-alert.success .alert-icon {
+            background: var(--success);
+        }
+
+        .glass-alert.error .alert-icon {
+            background: var(--danger);
+        }
+
+        .glass-alert .alert-content {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .glass-alert .alert-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-alert .alert-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Form Styles */
+        .search-form {
+            position: relative;
+        }
+
+        .form-grid {
+            display: grid;
+            /* NEW: thêm 1 cột cho Thanh toán */
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+
+        .glass-input, .glass-select {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-input {
+            padding-left: 3rem;
+        }
+
+        .glass-input:focus, .glass-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            grid-column: span 2;
+        }
+
+        /* Glass Buttons */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .glass-btn.primary::before {
+            background: var(--gradient-secondary);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Small Glass Buttons */
+        .glass-btn-sm {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            margin: 0 2px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .glass-btn-sm:hover {
+            transform: translateY(-2px) scale(1.1);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: white;
+        }
+
+        .glass-btn-sm.info {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .glass-btn-sm.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .glass-btn-sm.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+        }
+
+        .glass-btn-sm.success {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .glass-btn-sm.primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+        }
+
+        .glass-btn-sm.rating {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        }
+
+        .glass-btn-sm.disabled {
+            background: rgba(108, 117, 125, 0.3);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .glass-btn-sm.disabled:hover {
+            transform: none;
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Glass Badge */
+        .glass-badge {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Table Styles */
+        .table-container {
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .glass-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .glass-table th {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .glass-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+
+        .glass-table tbody tr {
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .glass-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Order specific styles */
+        .order-id {
+            font-weight: 700;
+            color: var(--primary-blue);
+            background: rgba(0, 102, 204, 0.1);
+            padding: 0.3rem 0.75rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .customer-info .customer-name {
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .customer-info .customer-email {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .customer-info .no-customer {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .shipping-info {
+            font-size: 0.85rem;
+        }
+
+        .shipping-info > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .shipping-info i {
+            color: var(--primary-blue);
+            width: 12px;
+        }
+
+        .shipping-info .no-shipping {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .price-badge {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            box-shadow: var(--shadow-light);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .status-badge.confirmed {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .status-badge.completed {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .status-badge.unknown {
+            background: linear-gradient(135deg, var(--text-secondary) 0%, #6b7280 100%);
+        }
+
+        .date-info .date {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .date-info .time {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .voucher-badge {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .no-voucher {
+            color: var(--text-secondary);
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 102, 204, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: var(--primary-blue);
+            font-size: 3rem;
+        }
+
+        .empty-state h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Animations */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1400px) {
+            .form-grid {
+                /* NEW: giữ thêm 1 cột phụ khi màn hình lớn vừa */
+                grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
+                gap: 1rem;
+            }
+            
+            .form-actions {
+                grid-column: span 2;
+            }
+        }
+
+        @@media (max-width: 1200px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            
+            .form-actions {
+                grid-column: 1 / -1;
+                justify-content: center;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .orders-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .workflow-info {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .workflow-info .fas.fa-arrow-right {
+                transform: rotate(90deg);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .glass-table {
+                font-size: 0.8rem;
+            }
+
+            .glass-table th,
+            .glass-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .shipping-info {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Popup Styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: hidden;
+            transform: scale(0.8) translateY(50px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .popup-overlay.show .popup-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .popup-header {
+            padding: 2rem 2rem 1rem;
+            text-align: center;
+            position: relative;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .popup-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            box-shadow: var(--shadow-medium);
+            color: white;
+            font-size: 2.5rem;
+            background: var(--gradient-primary);
+        }
+
+        .popup-icon.success {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .popup-icon.error {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+        }
+
+        .popup-icon.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .popup-icon.info {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .popup-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .popup-close:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .popup-body {
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+
+        .popup-body p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .popup-footer {
+            padding: 1rem 2rem 2rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .popup-footer .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .popup-footer .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .popup-footer .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            color: white;
+        }
+
+        .popup-footer .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .popup-footer .glass-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .popup-footer .glass-btn.primary::before {
+            background: linear-gradient(135deg, var(--ocean-blue) 0%, var(--primary-blue) 100%);
+        }
+
+        .popup-footer .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .popup-footer .glass-btn.secondary::before {
+            background: linear-gradient(135deg, var(--text-secondary) 0%, #6b7280 100%);
+        }
+
+        .popup-footer .glass-btn.secondary:hover {
+            color: white;
+        }
+
+        /* Animation cho popup icon */
+        @@keyframes popupSuccess {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @@keyframes popupError {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(-10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .popup-icon.animate-success {
+            animation: popupSuccess 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .popup-icon.animate-error {
+            animation: popupError 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Các hàm xử lý popup
+        function showPopup(type, title, message) {
+            const overlay = document.getElementById('popup-overlay');
+            const icon = document.getElementById('popup-icon');
+            const titleElement = document.getElementById('popup-title');
+            const messageElement = document.getElementById('popup-message');
+            
+            // Thiết lập nội dung popup
+            titleElement.textContent = title;
+            messageElement.textContent = message;
+            
+            // Đặt lại class biểu tượng
+            icon.className = 'fas';
+            
+            // Thiết lập biểu tượng và kiểu dựa trên loại
+            switch (type) {
+                case 'success':
+                    icon.classList.add('fa-check-circle', 'success', 'animate-success');
+                    break;
+                case 'error':
+                    icon.classList.add('fa-exclamation-circle', 'error', 'animate-error');
+                    break;
+                case 'warning':
+                    icon.classList.add('fa-exclamation-triangle', 'warning', 'animate-warning');
+                    break;
+                case 'info':
+                    icon.classList.add('fa-info-circle', 'info', 'animate-info');
+                    break;
+                default:
+                    icon.classList.add('fa-info-circle', 'info');
+            }
+            
+            // Hiển thị popup
+            overlay.classList.add('show');
+            
+            // Tự động đóng sau 5 giây
+            setTimeout(() => {
+                closePopup();
+            }, 5000);
+        }
+        
+        function closePopup() {
+            const overlay = document.getElementById('popup-overlay');
+            overlay.classList.remove('show');
+        }
+        
+        function showConfirmationPopup(message, onConfirm) {
+            console.log('showConfirmationPopup được gọi với thông điệp:', message); // Debug
+            
+            const overlay = document.getElementById('popup-overlay');
+            const icon = document.getElementById('popup-icon');
+            const titleElement = document.getElementById('popup-title');
+            const messageElement = document.getElementById('popup-message');
+            const footer = overlay.querySelector('.popup-footer');
+            
+            if (!overlay || !icon || !titleElement || !messageElement || !footer) {
+                console.error('Thiếu phần tử popup'); // Debug
+                return;
+            }
+            
+            // Thiết lập nội dung popup
+            titleElement.textContent = 'Xác nhận thao tác';
+            messageElement.textContent = message;
+            
+            // Thiết lập biểu tượng
+            icon.className = 'fas fa-question-circle warning';
+            
+            // Cập nhật footer với nút xác nhận
+            footer.innerHTML = `
+                <button type="button" class="glass-btn primary" onclick="confirmAction()">
+                    <i class="fas fa-check"></i>
+                    <span>Xác nhận</span>
+                </button>
+                <button type="button" class="glass-btn secondary" onclick="closePopup()" style="margin-left: 1rem;">
+                    <i class="fas fa-times"></i>
+                    <span>Hủy bỏ</span>
+                </button>
+            `;
+            
+            // Lưu callback
+            window.currentConfirmAction = onConfirm;
+            
+            // Hiển thị popup
+            overlay.classList.add('show');
+            console.log('Popup nên hiển thị ngay bây giờ'); // Debug
+        }
+        
+        function confirmAction() {
+            closePopup();
+            if (window.currentConfirmAction) {
+                window.currentConfirmAction();
+                window.currentConfirmAction = null;
+            }
+        }
+        
+        // Đóng popup khi click ra ngoài
+        document.getElementById('popup-overlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+        
+        // Đóng popup bằng phím Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closePopup();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Kiểm tra popup khi tải trang
+            console.log('Page loaded, testing popup...');
+            
+            // Kiểm tra thông điệp TempData và hiển thị popup
+            @if (TempData["Success"] != null)
+            {
+                <text>
+                showPopup('success', 'Thành công', '@Html.Raw(HttpUtility.JavaScriptStringEncode(TempData["Success"]?.ToString() ?? ""))');
+                </text>
+            }
+            
+            @if (TempData["Error"] != null)
+            {
+                <text>
+                showPopup('error', 'Lỗi', '@Html.Raw(HttpUtility.JavaScriptStringEncode(TempData["Error"]?.ToString() ?? ""))');
+                </text>
+            }
+            
+            // Handle confirmation buttons
+            document.querySelectorAll('.confirm-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Confirmation button clicked'); // Debug
+                    
+                    const action = this.dataset.action;
+                    const id = this.dataset.id;
+                    const message = this.dataset.message;
+                    const form = this.closest('form');
+                    
+                    console.log('Action:', action, 'ID:', id, 'Message:', message); // Debug
+                    
+                    if (message && form) {
+                        showConfirmationPopup(message, function() {
+                            console.log('Confirmed, submitting form'); // Debug
+                            form.submit();
+                        });
+                    } else {
+                        console.error('Missing message or form element'); // Debug
+                        // Fallback: show a simple confirm dialog
+                        if (confirm(message || 'Bạn có chắc chắn muốn thực hiện thao tác này?')) {
+                            form.submit();
+                        }
+                    }
+                });
+            });
+
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchTerm');
+            const statusSelect = document.getElementById('status');
+            // NEW: phần tử select thanh toán
+            const paymentStatusSelect = document.getElementById('paymentStatus');
+            const priceRangeSelect = document.getElementById('priceRange');
+            const fromDateInput = document.getElementById('fromDate');
+            const toDateInput = document.getElementById('toDate');
+            const sortBySelect = document.getElementById('sortBy');
+            const sortOrderSelect = document.getElementById('sortOrder');
+
+            // Auto-submit on filter changes
+            [statusSelect, paymentStatusSelect, priceRangeSelect, fromDateInput, toDateInput, sortBySelect, sortOrderSelect].forEach(function(element) {
+                if (element) {
+                    element.addEventListener('change', function() {
+                        searchForm.submit();
+                    });
+                }
+            });
+
+            // Submit on Enter key in search box
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchForm.submit();
+                    }
+                });
+            }
+
+            // Add smooth animations
+            const rows = document.querySelectorAll('.glass-table tbody tr');
+            rows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.1}s`;
+                row.classList.add('fade-in-up');
+            });
+
+            // Auto-dismiss alerts
+            setTimeout(() => {
+                document.querySelectorAll('.glass-alert').forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateX(100%)';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+        });
+    </script>
+}

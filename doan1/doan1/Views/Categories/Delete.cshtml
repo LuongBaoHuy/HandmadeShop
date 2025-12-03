@@ -1,0 +1,566 @@
+@model doan1.Models.Category
+
+@{
+    ViewData["Title"] = "Xóa danh mục";
+}
+
+<div class="categories-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h1>Xác nhận xóa danh mục</h1>
+                <p>Bạn có chắc chắn muốn xóa danh mục "@Model.CategoriesName" không?</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="delete-container">
+        <div class="glass-card warning-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-warning"></i>
+                    Cảnh báo quan trọng
+                </h3>
+                <div class="warning-badge">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Hành động không thể hoàn tác
+                </div>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.HasProducts == true)
+                {
+                    <div class="alert-glass danger">
+                        <div class="alert-icon">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Không thể xóa danh mục</h4>
+                            <p>Danh mục này có <strong>@ViewBag.ProductCount sản phẩm</strong> liên quan. Vui lòng chuyển tất cả sản phẩm sang danh mục khác hoặc xóa các sản phẩm trước khi xóa danh mục này.</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert-glass warning">
+                        <div class="alert-icon">
+                            <i class="fas fa-warning"></i>
+                        </div>
+                        <div class="alert-content">
+                            <h4>Xác nhận xóa</h4>
+                            <p>Bạn có chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác sau khi thực hiện.</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="glass-card info-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-info-circle"></i>
+                    Thông tin danh mục cần xóa
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="category-info-grid">
+                    <div class="category-overview">
+                        <div class="category-icon-large">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="category-details">
+                            <h2>@Model.CategoriesName</h2>
+                            <div class="category-stats">
+                                <div class="stat-item">
+                                    <i class="fas fa-hashtag"></i>
+                                    <span>ID: @Model.Id</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-box"></i>
+                                    <span>@(ViewBag.ProductCount ?? 0) sản phẩm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card actions-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-cogs"></i>
+                    Hành động
+                </h3>
+            </div>
+            <div class="card-body">
+                <form asp-action="Delete" method="post">
+                    <div class="action-buttons">
+                        <a asp-action="Index" class="glass-btn secondary large">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Hủy bỏ</span>
+                        </a>
+                        
+                        @if (ViewBag.HasProducts == true)
+                        {
+                            <button type="button" class="glass-btn disabled large" disabled>
+                                <i class="fas fa-ban"></i>
+                                <span>Không thể xóa</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="glass-btn danger large confirm-delete">
+                                <i class="fas fa-trash"></i>
+                                <span>Xác nhận xóa</span>
+                            </button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .categories-container {
+            padding: 2rem 1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-danger);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-danger);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-danger);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .delete-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .warning-card .card-header i {
+            color: var(--warning);
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        .warning-badge {
+            background: var(--gradient-danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .alert-glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .alert-glass.warning {
+            border-left: 5px solid var(--warning);
+        }
+
+        .alert-glass.danger {
+            border-left: 5px solid var(--danger);
+        }
+
+        .alert-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .alert-glass.warning .alert-icon {
+            background: var(--gradient-warning);
+        }
+
+        .alert-glass.danger .alert-icon {
+            background: var(--gradient-danger);
+        }
+
+        .alert-content h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .alert-content p {
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .category-overview {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .category-icon-large {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+
+        .category-details {
+            flex: 1;
+        }
+
+        .category-details h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .category-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-item i {
+            color: var(--primary-blue);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .glass-btn.large {
+            padding: 1.25rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .glass-btn.danger {
+            background: var(--gradient-danger);
+            color: white;
+        }
+
+        .glass-btn.danger::before {
+            background: linear-gradient(135deg, #f87171 0%, var(--danger) 100%);
+        }
+
+        .glass-btn.disabled {
+            background: rgba(108, 117, 125, 0.3);
+            color: rgba(108, 117, 125, 0.6);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .glass-btn.disabled:hover {
+            transform: none;
+            box-shadow: var(--shadow-light);
+        }
+
+        .confirm-delete {
+            position: relative;
+        }
+
+        .confirm-delete:hover {
+            animation: pulse 0.6s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { transform: translateY(-3px) scale(1); }
+            50% { transform: translateY(-3px) scale(1.02); }
+            100% { transform: translateY(-3px) scale(1); }
+        }
+
+        @@media (max-width: 768px) {
+            .categories-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .category-overview {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+
+            .category-details h2 {
+                font-size: 1.5rem;
+            }
+
+            .category-stats {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .alert-glass {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmDeleteBtn = document.querySelector('.confirm-delete');
+            
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    if (confirm('Bạn có THỰC SỰ chắc chắn muốn xóa danh mục này không? Hành động này không thể hoàn tác!')) {
+                        this.closest('form').submit();
+                    }
+                });
+            }
+        });
+    </script>
+}

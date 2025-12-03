@@ -1,0 +1,1626 @@
+@model doan1.Models.Product
+
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+}
+
+<div class="products-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h1>Chỉnh sửa sản phẩm</h1>
+                <p>Cập nhật thông tin sản phẩm "@Model.Name"</p>
+            <div class="edit-container">
+                <form asp-action="Edit" enctype="multipart/form-data" class="product-form">
+                    <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-layout">
+                        <!-- Thông tin hiện tại -->
+                        <div class="glass-card current-info-card">
+                            <div class="card-header">
+                                <h3>
+                                    <i class="fas fa-info-circle"></i>
+                                    Thông tin hiện tại
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="current-product-info">
+                                    <div class="current-image">
+                                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                        {
+                                            <img src="@Model.ImageUrl" alt="@Model.Name" onerror="this.onerror=null; this.src='/images/no-image.png';" loading="lazy" />
+                                        }
+                                        else
+                                        {
+                                            <div class="no-image-placeholder">
+                                                <i class="fas fa-image"></i>
+                                                <span>Chưa có ảnh</span>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="current-details">
+                                        <h4>@Model.Name</h4>
+                                        <p class="current-category">
+                                            @if (Model.Category != null)
+                                            {
+                                                <span><i class="fas fa-tag"></i> @Model.Category.CategoriesName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="no-category">Chưa có danh mục</span>
+                                            }
+                                        </p>
+                                        <div class="current-price-info">
+                                            @if (Model.Price.HasValue)
+                                            {
+                                                <span class="current-price">@Model.Price.Value.ToString("C0")</span>
+                                            }
+                                            @if (Model.OriginalPrice.HasValue && Model.OriginalPrice.Value > 0)
+                                            {
+                                                <span class="original-price">@Model.OriginalPrice.Value.ToString("C0")</span>
+                                            }
+                                        </div>
+                                        <p class="current-stock">
+                                            <i class="fas fa-boxes"></i>
+                                            @(Model.Stock?.ToString() ?? "0") sản phẩm trong kho
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Form chỉnh sửa -->
+                    <div class="glass-card form-card">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-edit"></i>
+                                Thông tin mới
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label asp-for="Name" class="form-label">Tên sản phẩm</label>
+                                    <div class="input-group">
+                                        <div class="input-icon"></div>
+                                        <input asp-for="Name" class="glass-input" placeholder="Nhập tên sản phẩm..." />
+                                    </div>
+                                    <span asp-validation-for="Name" class="validation-error"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="CategoryId" class="form-label">Danh mục</label>
+                                    <div class="input-group">
+                                        <div class="input-icon"></div>
+                                        <select asp-for="CategoryId" class="glass-select" asp-items="ViewBag.CategoryId"></select>
+                                    </div>
+                                    <span asp-validation-for="CategoryId" class="validation-error"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Description" class="form-label">Mô tả sản phẩm</label>
+                                <textarea asp-for="Description" class="glass-textarea" rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                                <span asp-validation-for="Description" class="validation-error"></span>
+                            </div>
+                            <div class="form-grid-3">
+                                <div class="form-group">
+                                    <label asp-for="OriginalPrice" class="form-label">Giá gốc</label>
+                                    <div class="input-group">
+                                        <div class="input-icon"></div>
+                                        <input asp-for="OriginalPrice" class="glass-input" type="number" step="0.01" min="0" placeholder="0" />
+                                        <div class="input-suffix">VNĐ</div>
+                                    </div>
+                                    <span asp-validation-for="OriginalPrice" class="validation-error"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="DiscountedPrice" class="form-label">Giá khuyến mãi</label>
+                                    <div class="input-group">
+                                        <div class="input-icon"></div>
+                                        <input asp-for="DiscountedPrice" class="glass-input" type="number" step="0.01" min="0" placeholder="0" />
+                                        <div class="input-suffix">VNĐ</div>
+                                    </div>
+                                    <span asp-validation-for="DiscountedPrice" class="validation-error"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Price" class="form-label">Giá bán</label>
+                                    <div class="input-group">
+                                        <div class="input-icon"></div>
+                                        <input asp-for="Price" class="glass-input" type="number" step="0.01" min="0" placeholder="0" />
+                                        <div class="input-suffix">VNĐ</div>
+                                    </div>
+                                    <span asp-validation-for="Price" class="validation-error"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="Stock" class="form-label">Số lượng tồn kho</label>
+                                <div class="input-group">
+                                    <div class="input-icon"><i class="fas fa-boxes"></i></div>
+                                    <input asp-for="Stock" class="glass-input" type="number" min="0" placeholder="0" />
+                                    <div class="input-suffix">sản phẩm</div>
+                                </div>
+                                <span asp-validation-for="Stock" class="validation-error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Upload ảnh mới -->
+                    <div class="glass-card image-card">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-images"></i>
+                                Cập nhật hình ảnh
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="ProductImage" class="form-label">Chọn ảnh mới (tùy chọn)</label>
+                                <div class="file-upload-area" id="fileUploadArea">
+                                    <input type="file" class="file-input" id="ProductImage" name="ProductImage" accept="image/*" />
+                                    <input type="hidden" asp-for="ImageUrl" />
+                                    <div class="upload-content">
+                                        <div class="upload-icon"></div>
+                                        <h4>Kéo thả ảnh mới vào đây hoặc click để chọn</h4>
+                                        <p>Để trống nếu không muốn thay đổi ảnh. Chấp nhận: JPG, JPEG, PNG, GIF, BMP. Tối đa 5MB.</p>
+                                    </div>
+                                    <div class="upload-preview" id="uploadPreview" style="display: none;">
+                                        <img id="imagePreview" src="#" alt="Xem trước ảnh" />
+                                        <div class="preview-overlay"></div>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="ImageUrl" class="validation-error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Preview thay đổi -->
+                    <div class="glass-card preview-card">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-eye"></i>
+                                Xem trước thay đổi
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="change-preview" id="changePreview">
+                                <div class="preview-image">
+                                    <div class="current-image-preview">
+                                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                        {
+                                            <img src="@Model.ImageUrl" alt="Ảnh hiện tại" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="placeholder-image"><i class="fas fa-image"></i> Không có ảnh</div>
+                                        }
+                                    </div>
+                                    <div class="arrow-icon">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+                                    <div class="new-image-preview">
+                                        <img id="newPreviewImage" style="display: none;" alt="Ảnh mới" />
+                                    </div>
+                                </div>
+                                <div class="preview-info">
+                                    <h4 id="previewName">@Model.Name</h4>
+                                    <p id="previewCategory" class="category-preview"></p>
+                                    <div class="price-preview"></div>
+                                    <p id="previewDescription" class="description-preview">@Model.Description</p>
+                                    <div class="stock-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Quản lý biến thể sản phẩm -->
+                    <div class="glass-card variations-card">
+                        <div class="card-header">
+                            <h3>
+                                <i class="fas fa-layer-group"></i>
+                                Quản lý biến thể sản phẩm
+                            </h3>
+                            <button type="button" class="glass-btn primary" id="generateVariationsBtn">
+                                <i class="fas fa-magic"></i>
+                                <span>Tạo biến thể</span>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- Tab Navigation -->
+                            <ul class="nav nav-tabs variation-tabs" id="variationTabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="attributes-tab" data-bs-toggle="tab" href="#attributes" role="tab">
+                                        <i class="fas fa-tags"></i>
+                                        Thuộc tính
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="variations-tab" data-bs-toggle="tab" href="#variations" role="tab">
+                                        <i class="fas fa-layer-group"></i>
+                                        Biến thể
+                                    </a>
+                                </li>
+                            </ul>
+                            <!-- Tab Content -->
+                            <div class="tab-content variation-tab-content">
+                                <!-- Attributes Tab -->
+                                <div class="tab-pane fade show active" id="attributes" role="tabpanel">
+                                    <div class="attributes-container">
+                                        <div class="attributes-header"></div>
+                                        <div id="attributesList" class="attributes-list"></div>
+                                    </div>
+                                </div>
+                                <!-- Variations Tab -->
+                                <div class="tab-pane fade" id="variations" role="tabpanel">
+                                    <div class="variations-container">
+                                        <div class="variations-header"></div>
+                                        <div class="variation-table-container"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action buttons -->
+                    <div class="glass-card actions-card">
+                        <div class="card-body">
+                            <div class="action-buttons">
+                                <a asp-action="Index" class="glass-btn secondary large">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span>Quay lại danh sách</span>
+                                </a>
+                                <button type="submit" class="glass-btn success large">
+                                    <i class="fas fa-save"></i>
+                                    <span>Cập nhật sản phẩm</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab Content -->
+                    <div class="tab-content variation-tab-content">
+                        <!-- Attributes Tab -->
+                        <div class="tab-pane fade show active" id="attributes" role="tabpanel">
+                            <div class="attributes-container">
+                                <div class="attributes-header">
+                                    <p class="help-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Thêm các thuộc tính như màu sắc, kích thước cho sản phẩm. Sau đó tạo biến thể để có giá và tồn kho riêng.
+                                    </p>
+                                    <button type="button" class="glass-btn secondary" id="addAttributeBtn">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Thêm thuộc tính</span>
+                                    </button>
+                                </div>
+                                
+                                <div id="attributesList" class="attributes-list">
+                                    <!-- Dynamic attribute fields will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Variations Tab -->
+                        <div class="tab-pane fade" id="variations" role="tabpanel">
+                            <div class="variations-container">
+                                <div class="variations-header">
+                                    <p class="help-text">
+                                        <i class="fas fa-info-circle"></i>
+                                        Quản lý giá và tồn kho cho từng biến thể sản phẩm.
+                                    </p>
+                                </div>
+                                
+                                <div class="variation-table-container">
+                                    <table class="table variation-table" id="variationsTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Tổ hợp thuộc tính</th>
+                                                <th>Giá (VNĐ)</th>
+                                                <th>Tồn kho</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Variations will be generated here -->
+                                        </tbody>
+                                    </table>
+                                    
+                                    <div class="empty-variations" id="emptyVariations">
+                                        <div class="empty-icon">
+                                            <i class="fas fa-layer-group"></i>
+                                        </div>
+                                        <h4>Chưa có biến thể nào</h4>
+                                        <p>Thêm thuộc tính và nhấn "Tạo biến thể" để bắt đầu.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="glass-card actions-card">
+                <div class="card-body">
+                    <div class="action-buttons">
+                        <a asp-action="Index" class="glass-btn secondary large">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Quay lại danh sách</span>
+                        </a>
+                        <button type="submit" class="glass-btn success large">
+                            <i class="fas fa-save"></i>
+                            <span>Cập nhật sản phẩm</span>
+                        </button>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('ProductImage');
+            const uploadArea = document.getElementById('fileUploadArea');
+            const uploadPreview = document.getElementById('uploadPreview');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeImageBtn = document.getElementById('removeImage');
+            
+            const newPreviewImage = document.getElementById('newPreviewImage');
+            const newImagePlaceholder = document.getElementById('newImagePlaceholder');
+            
+            // Form inputs for live preview
+            const nameInput = document.querySelector('input[name="Name"]');
+            const categorySelect = document.querySelector('select[name="CategoryId"]');
+            const descriptionInput = document.querySelector('textarea[name="Description"]');
+            const priceInput = document.querySelector('input[name="Price"]');
+            const originalPriceInput = document.querySelector('input[name="OriginalPrice"]');
+            const stockInput = document.querySelector('input[name="Stock"]');
+
+            // Preview elements
+            const previewName = document.getElementById('previewName');
+            const previewCategory = document.getElementById('previewCategory');
+            const previewDescription = document.getElementById('previewDescription');
+            const previewPrice = document.getElementById('previewPrice');
+            const previewOriginalPrice = document.getElementById('previewOriginalPrice');
+            const previewStock = document.getElementById('previewStock');
+
+            // File upload handling
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0]);
+                }
+            });
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+            
+            removeImageBtn.addEventListener('click', function() {
+                fileInput.value = '';
+                uploadPreview.style.display = 'none';
+                uploadArea.querySelector('.upload-content').style.display = 'flex';
+                
+                newPreviewImage.style.display = 'none';
+                newImagePlaceholder.style.display = 'flex';
+            });
+
+            function handleFileSelect(file) {
+                // Validate file size
+                if (file.size > 5242880) {
+                    alert('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.');
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Vui lòng chọn file ảnh!');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    uploadPreview.style.display = 'block';
+                    uploadArea.querySelector('.upload-content').style.display = 'none';
+                    
+                    // Update new image preview
+                    newPreviewImage.src = e.target.result;
+                    newPreviewImage.style.display = 'block';
+                    newImagePlaceholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Live preview updates
+            function updatePreview() {
+                // Name
+                if (nameInput.value.trim()) {
+                    previewName.textContent = nameInput.value;
+                }
+
+                // Category
+                if (categorySelect.value) {
+                    const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+                    previewCategory.innerHTML = '<span>' + selectedOption.text + '</span>';
+                    previewCategory.className = 'category-preview selected';
+                }
+
+                // Description
+                if (descriptionInput.value.trim()) {
+                    previewDescription.textContent = descriptionInput.value;
+                }
+
+                // Price
+                const price = parseFloat(priceInput.value) || 0;
+                const originalPrice = parseFloat(originalPriceInput.value) || 0;
+                
+                if (price > 0) {
+                    previewPrice.textContent = price.toLocaleString('vi-VN') + ' VNĐ';
+                }
+                
+                if (originalPrice > 0 && originalPrice > price) {
+                    previewOriginalPrice.textContent = originalPrice.toLocaleString('vi-VN') + ' VNĐ';
+                    previewOriginalPrice.style.display = 'inline';
+                } else {
+                    previewOriginalPrice.style.display = 'none';
+                }
+
+                // Stock
+                const stock = parseInt(stockInput.value) || 0;
+                previewStock.textContent = stock + ' sản phẩm trong kho';
+            }
+
+            // Add event listeners for live preview
+            [nameInput, categorySelect, descriptionInput, priceInput, originalPriceInput, stockInput].forEach(input => {
+                if (input) {
+                    input.addEventListener('input', updatePreview);
+                    input.addEventListener('change', updatePreview);
+                }
+            });
+
+            // ===== VARIATION MANAGEMENT =====
+            let attributeCounter = 0;
+            const productId = @Model.Id;
+
+            // Load existing variations when page loads
+            loadProductVariations();
+
+            // Add attribute button
+            document.getElementById('addAttributeBtn').addEventListener('click', function() {
+                addAttributeField();
+            });
+
+            // Generate variations button
+            document.getElementById('generateVariationsBtn').addEventListener('click', function() {
+                generateVariations();
+            });
+
+            function addAttributeField() {
+                attributeCounter++;
+                const attributesList = document.getElementById('attributesList');
+                
+                const attributeItem = document.createElement('div');
+                attributeItem.className = 'attribute-item';
+                attributeItem.setAttribute('data-attr-id', attributeCounter);
+                
+                attributeItem.innerHTML = `
+                    <div class="attribute-header">
+                        <input type="text" class="glass-input attribute-name" placeholder="Tên thuộc tính (vd: Màu sắc)" required>
+                        <button type="button" class="glass-btn danger small remove-attribute">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="attribute-options">
+                        <div class="options-list">
+                            <div class="option-item">
+                                <input type="text" class="glass-input option-value" placeholder="Giá trị (vd: Đỏ)" required>
+                                <button type="button" class="glass-btn danger small remove-option">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="glass-btn secondary small add-option">
+                            <i class="fas fa-plus"></i>
+                            <span>Thêm giá trị</span>
+                        </button>
+                    </div>
+                `;
+                
+                attributesList.appendChild(attributeItem);
+                
+                // Add event listeners for new attribute
+                setupAttributeEvents(attributeItem);
+            }
+
+            function setupAttributeEvents(attributeItem) {
+                // Remove attribute
+                attributeItem.querySelector('.remove-attribute').addEventListener('click', function() {
+                    attributeItem.remove();
+                });
+                
+                // Add option
+                attributeItem.querySelector('.add-option').addEventListener('click', function() {
+                    addOptionField(attributeItem);
+                });
+                
+                // Remove option
+                attributeItem.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-option') || e.target.parentElement.classList.contains('remove-option')) {
+                        const optionItem = e.target.closest('.option-item');
+                        const optionsList = optionItem.parentElement;
+                        if (optionsList.children.length > 1) {
+                            optionItem.remove();
+                        } else {
+                            alert('Thuộc tính phải có ít nhất một giá trị!');
+                        }
+                    }
+                });
+            }
+
+            function addOptionField(attributeItem) {
+                const optionsList = attributeItem.querySelector('.options-list');
+                const optionItem = document.createElement('div');
+                optionItem.className = 'option-item';
+                optionItem.innerHTML = `
+                    <input type="text" class="glass-input option-value" placeholder="Giá trị" required>
+                    <button type="button" class="glass-btn danger small remove-option">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                optionsList.appendChild(optionItem);
+            }
+
+            function generateVariations() {
+                const attributes = collectAttributes();
+                if (attributes.length === 0) {
+                    alert('Vui lòng thêm ít nhất một thuộc tính!');
+                    return;
+                }
+
+                // Save attributes first, then generate variations
+                fetch(`/Products/GenerateVariations?productId=${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({ productId: productId, attributes: attributes })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        loadProductVariations();
+                        // Switch to variations tab
+                        document.getElementById('variations-tab').click();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi tạo biến thể!');
+                });
+            }
+
+            function collectAttributes() {
+                const attributes = [];
+                const attributeItems = document.querySelectorAll('.attribute-item');
+                
+                attributeItems.forEach(item => {
+                    const name = item.querySelector('.attribute-name').value.trim();
+                    if (!name) return;
+                    
+                    const options = [];
+                    const optionInputs = item.querySelectorAll('.option-value');
+                    optionInputs.forEach(input => {
+                        const value = input.value.trim();
+                        if (value) options.push(value);
+                    });
+                    
+                    if (options.length > 0) {
+                        attributes.push({ name, options });
+                    }
+                });
+                
+                return attributes;
+            }
+
+            function loadProductVariations() {
+                fetch(`/api/products/${productId}/variations`)
+                .then(response => response.json())
+                .then(variations => {
+                    displayVariations(variations);
+                })
+                .catch(error => {
+                    console.error('Error loading variations:', error);
+                });
+            }
+
+            function displayVariations(variations) {
+                const tbody = document.querySelector('#variationsTable tbody');
+                const emptyState = document.getElementById('emptyVariations');
+                
+                tbody.innerHTML = '';
+                
+                if (variations.length === 0) {
+                    emptyState.style.display = 'block';
+                    document.getElementById('variationsTable').style.display = 'none';
+                } else {
+                    emptyState.style.display = 'none';
+                    document.getElementById('variationsTable').style.display = 'table';
+                    
+                    variations.forEach(variation => {
+                        // Create display name from attributes
+                        const displayName = variation.attributes
+                            .map(attr => `${attr.attributeName}: ${attr.optionValue}`)
+                            .join(', ');
+                            
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="variation-attributes">
+                                    ${displayName}
+                                </div>
+                            </td>
+                            <td>
+                                <input type="number" class="glass-input variation-price" 
+                                       value="${variation.price}" 
+                                       data-variation-id="${variation.id}"
+                                       min="0" step="1000">
+                            </td>
+                            <td>
+                                <input type="number" class="glass-input variation-stock" 
+                                       value="${variation.stock}" 
+                                       data-variation-id="${variation.id}"
+                                       min="0">
+                            </td>
+                            <td>
+                                <div class="variation-actions">
+                                    <button type="button" class="glass-btn success small save-variation" 
+                                            data-variation-id="${variation.id}">
+                                        <i class="fas fa-save"></i>
+                                    </button>
+                                    <button type="button" class="glass-btn danger small delete-variation" 
+                                            data-variation-id="${variation.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                    
+                    // Add event listeners for variation actions
+                    setupVariationEvents();
+                }
+            }
+
+            function setupVariationEvents() {
+                // Save variation
+                document.querySelectorAll('.save-variation').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const variationId = this.getAttribute('data-variation-id');
+                        const row = this.closest('tr');
+                        const price = row.querySelector('.variation-price').value;
+                        const stock = row.querySelector('.variation-stock').value;
+                        
+                        updateVariation(variationId, price, stock);
+                    });
+                });
+                
+                // Delete variation
+                document.querySelectorAll('.delete-variation').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (confirm('Bạn có chắc chắn muốn xóa biến thể này?')) {
+                            const variationId = this.getAttribute('data-variation-id');
+                            deleteVariation(variationId);
+                        }
+                    });
+                });
+            }
+
+            function updateVariation(variationId, price, stock) {
+                fetch('/Products/UpdateVariation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        variationId: parseInt(variationId),
+                        price: parseFloat(price),
+                        stock: parseInt(stock)
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Cập nhật thành công!');
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra!');
+                });
+            }
+
+            function deleteVariation(variationId) {
+                fetch(`/Products/DeleteVariation?variationId=${variationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Xóa thành công!');
+                        loadProductVariations();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra!');
+                });
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            --gradient-success: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .products-container {
+            padding: 2rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .edit-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        .current-info-card {
+            grid-column: 1 / -1;
+        }
+
+        .current-product-info {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .current-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            flex-shrink: 0;
+        }
+
+        .current-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .no-image-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .current-details {
+            flex: 1;
+        }
+
+        .current-details h4 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .current-category {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .current-category i {
+            color: var(--primary-blue);
+            margin-right: 0.5rem;
+        }
+
+        .no-category {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .current-price-info {
+            margin-bottom: 1rem;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+        }
+
+        .current-stock {
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .current-stock i {
+            color: var(--primary-blue);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            z-index: 2;
+        }
+
+        .glass-input, .glass-select, .glass-textarea {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-input {
+            padding-left: 3rem;
+        }
+
+        .glass-input:focus, .glass-select:focus, .glass-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .validation-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+        }
+
+        .validation-summary {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--danger);
+        }
+
+        /* File Upload */
+        .file-upload-area {
+            position: relative;
+            border: 2px dashed rgba(0, 102, 204, 0.3);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover,
+        .file-upload-area.drag-over {
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 204, 0.05);
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-icon i {
+            font-size: 3rem;
+            color: var(--primary-blue);
+        }
+
+        .upload-content h4 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .upload-content p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .upload-preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .upload-preview img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .preview-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 1rem;
+        }
+
+        .remove-image {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .remove-image:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Change Preview */
+        .change-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .preview-image {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            justify-content: center;
+        }
+
+        .current-image-preview,
+        .new-image-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+
+        .current-image-preview img,
+        .new-image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder-image {
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .placeholder-image i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .arrow-icon {
+            font-size: 2rem;
+            color: var(--primary-blue);
+        }
+
+        .preview-info h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .category-preview {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .category-preview.selected {
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .price-preview {
+            margin-bottom: 1rem;
+        }
+
+        .current-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .original-price {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+        }
+
+        .description-preview {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .stock-preview {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .stock-preview i {
+            color: var(--primary-blue);
+        }
+
+        /* Action buttons */
+        .actions-card .card-body {
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: none;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .glass-btn.large {
+            padding: 1.25rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .glass-btn.success::before {
+            background: linear-gradient(135deg, #34d399 0%, var(--success) 100%);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        @@media (max-width: 1200px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .products-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .current-product-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .current-image {
+                width: 100%;
+                height: 250px;
+                margin: 0 auto;
+            }
+
+            .form-grid,
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-image {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .arrow-icon {
+                transform: rotate(90deg);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Variation Management Styles */
+        .variation-card {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+        }
+        
+        .nav-tabs .nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            margin-right: 5px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-bottom-color: transparent;
+        }
+        
+        .tab-content {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: none;
+            border-radius: 0 12px 12px 12px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .attribute-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .attribute-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .attribute-header .glass-input {
+            flex: 1;
+        }
+        
+        .attribute-options {
+            margin-left: 10px;
+        }
+        
+        .options-list {
+            margin-bottom: 10px;
+        }
+        
+        .option-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .option-item .glass-input {
+            flex: 1;
+        }
+        
+        .glass-btn.small {
+            padding: 5px 10px;
+            font-size: 12px;
+            min-width: auto;
+        }
+        
+        .glass-btn.danger {
+            background: rgba(220, 53, 69, 0.2);
+            border-color: rgba(220, 53, 69, 0.5);
+            color: #ff6b7d;
+        }
+        
+        .glass-btn.danger:hover {
+            background: rgba(220, 53, 69, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .glass-btn.success {
+            background: rgba(40, 167, 69, 0.2);
+            border-color: rgba(40, 167, 69, 0.5);
+            color: #40f576;
+        }
+        
+        .glass-btn.success:hover {
+            background: rgba(40, 167, 69, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.2);
+            border-color: rgba(108, 117, 125, 0.5);
+            color: #adb5bd;
+        }
+        
+        .glass-btn.secondary:hover {
+            background: rgba(108, 117, 125, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        #variationsTable {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #variationsTable th {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 12px;
+        }
+        
+        #variationsTable td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+        }
+        
+        .variation-attributes {
+            font-weight: 500;
+            color: #e9ecef;
+        }
+        
+        .variation-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .variation-price, .variation-stock {
+            width: 100px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .alert-info {
+            background: rgba(13, 202, 240, 0.1);
+            border: 1px solid rgba(13, 202, 240, 0.3);
+            color: #0dcaf0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+        }
+    </style>
+}

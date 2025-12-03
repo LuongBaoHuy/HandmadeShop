@@ -1,0 +1,893 @@
+@model IEnumerable<doan1.Models.User>
+
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<div class="users-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h1>Quản lý người dùng</h1>
+                <p>Quản lý thông tin và quyền hạn người dùng hệ thống</p>
+            </div>
+            <a asp-action="Create" class="glass-btn primary">
+                <i class="fas fa-plus"></i>
+                <span>Thêm người dùng mới</span>
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="glass-alert success">
+            <div class="alert-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="alert-content">
+                @TempData["Success"]
+            </div>
+            <button type="button" class="alert-close" data-bs-dismiss="alert">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="glass-alert error">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+                @TempData["Error"]
+            </div>
+            <button type="button" class="alert-close" data-bs-dismiss="alert">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+    <!-- Form tìm kiếm và lọc -->
+    <div class="glass-card search-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-search"></i>
+                Tìm kiếm và lọc người dùng
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="search-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="searchTerm" class="form-label">Từ khóa tìm kiếm</label>
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <input type="text" class="glass-input" id="searchTerm" name="searchTerm" 
+                                   value="@ViewBag.SearchTerm" placeholder="Tìm theo tên, email, username...">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="roleFilter" class="form-label">Vai trò</label>
+                        <select class="glass-select" id="roleFilter" name="roleFilter">
+                            <option value="">Tất cả vai trò</option>
+                            <option value="Admin" selected="@(ViewBag.RoleFilter == "Admin")">Admin</option>
+                            <option value="Customer" selected="@(ViewBag.RoleFilter == "Customer")">Customer</option>
+                            <option value="Manager" selected="@(ViewBag.RoleFilter == "Manager")">Manager</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortBy" class="form-label">Sắp xếp theo</label>
+                        <select class="glass-select" id="sortBy" name="sortBy">
+                            <option value="id" selected="@(ViewBag.SortBy == "id")">ID</option>
+                            <option value="username" selected="@(ViewBag.SortBy == "username")">Tên đăng nhập</option>
+                            <option value="email" selected="@(ViewBag.SortBy == "email")">Email</option>
+                            <option value="fullname" selected="@(ViewBag.SortBy == "fullname")">Họ và tên</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortOrder" class="form-label">Thứ tự</label>
+                        <select class="glass-select" id="sortOrder" name="sortOrder">
+                            <option value="asc" selected="@(ViewBag.SortOrder == "asc")">Tăng dần</option>
+                            <option value="desc" selected="@(ViewBag.SortOrder == "desc")">Giảm dần</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="glass-btn primary">
+                            <i class="fas fa-search"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
+                        <a href="@Url.Action("Index")" class="glass-btn secondary">
+                            <i class="fas fa-undo"></i>
+                            <span>Đặt lại</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="glass-card data-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-list"></i>
+                Danh sách người dùng
+            </h3>
+            @if (ViewBag.SearchResults != null)
+            {
+                <span class="glass-badge">@ViewBag.SearchResults</span>
+            }
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                @if (Model.Any())
+                {
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Ảnh đại diện</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Email</th>
+                                <th>Họ và tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Vai trò</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="user-id">@Html.DisplayFor(modelItem => item.Id)</span>
+                                    </td>
+                                    <td>
+                                        <div class="user-avatar">
+                                            @if (!string.IsNullOrEmpty(item.ProfileImageUrl))
+                                            {
+                                                <img src="@item.ProfileImageUrl" alt="Profile" />
+                                            }
+                                            else
+                                            {
+                                                <div class="avatar-placeholder">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="username">@Html.DisplayFor(modelItem => item.Username)</span>
+                                    </td>
+                                    <td>
+                                        <span class="email">@Html.DisplayFor(modelItem => item.Email)</span>
+                                    </td>
+                                    <td>
+                                        <span class="fullname">@Html.DisplayFor(modelItem => item.FullName)</span>
+                                    </td>
+                                    <td>
+                                        <span class="phone">@Html.DisplayFor(modelItem => item.Phone)</span>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.Role))
+                                        {
+                                            <span class="role-badge @item.Role.ToLower()">@item.Role</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="glass-btn-sm info" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="glass-btn-sm warning" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="glass-btn-sm danger" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <h4>Không tìm thấy người dùng nào</h4>
+                        <p>Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc.</p>
+                        <a href="@Url.Action("Index")" class="glass-btn primary">
+                            <i class="fas fa-undo"></i>
+                            <span>Xem tất cả người dùng</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-submit form khi thay đổi sort options
+        $('#sortBy, #sortOrder, #roleFilter').change(function() {
+            $(this).closest('form').submit();
+        });
+
+        // Enter key submit cho search box
+        $('#searchTerm').keypress(function(e) {
+            if (e.which == 13) {
+                $(this).closest('form').submit();
+            }
+        });
+
+        // Clear search functionality
+        function clearSearch() {
+            $('#searchTerm').val('');
+            $('#roleFilter').val('');
+            $('#sortBy').val('id');
+            $('#sortOrder').val('asc');
+            $('form').submit();
+        }
+
+        // Add smooth animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate table rows
+            const rows = document.querySelectorAll('.glass-table tbody tr');
+            rows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.1}s`;
+                row.classList.add('fade-in-up');
+            });
+
+            // Auto-dismiss alerts
+            setTimeout(() => {
+                document.querySelectorAll('.glass-alert').forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateX(100%)';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        /* CSS Variables */
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            --shadow-neumorphism-inset: inset 20px 20px 60px #bebebe, inset -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        /* Global Styles */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .users-container {
+            padding: 2rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Glass Buttons */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .glass-btn.primary::before {
+            background: var(--gradient-secondary);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Small Glass Buttons */
+        .glass-btn-sm {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            margin: 0 2px;
+        }
+
+        .glass-btn-sm:hover {
+            transform: translateY(-2px) scale(1.1);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: white;
+        }
+
+        .glass-btn-sm.info {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .glass-btn-sm.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .glass-btn-sm.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+        }
+
+        /* Glass Alerts */
+        .glass-alert {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-alert.success {
+            border-left: 4px solid var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .glass-alert.error {
+            border-left: 4px solid var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .glass-alert .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .glass-alert.success .alert-icon {
+            background: var(--success);
+        }
+
+        .glass-alert.error .alert-icon {
+            background: var(--danger);
+        }
+
+        .glass-alert .alert-content {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .glass-alert .alert-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-alert .alert-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+
+        /* Form Styles */
+        .search-form {
+            position: relative;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            z-index: 2;
+        }
+
+        .glass-input, .glass-select {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-input {
+            padding-left: 3rem;
+        }
+
+        .glass-input:focus, .glass-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Glass Badge */
+        .glass-badge {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+        }
+
+        /* Table Styles */
+        .table-container {
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .glass-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .glass-table th {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.2rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .glass-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            vertical-align: middle;
+        }
+
+        .glass-table tbody tr {
+            transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .glass-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        /* User specific styles */
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .user-id {
+            font-weight: 600;
+            color: var(--primary-blue);
+            background: rgba(0, 102, 204, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .username {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .email {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .fullname {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .phone {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .role-badge {
+            padding: 0.35rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .role-badge.admin {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .role-badge.customer {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .role-badge.manager {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 102, 204, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: var(--primary-blue);
+            font-size: 3rem;
+        }
+
+        .empty-state h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Animations */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1200px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+            }
+            
+            .form-actions {
+                grid-column: 1 / -1;
+                justify-content: center;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .users-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .glass-table {
+                font-size: 0.85rem;
+            }
+
+            .glass-table th,
+            .glass-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+}

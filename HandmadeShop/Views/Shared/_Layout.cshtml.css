@@ -1,0 +1,367 @@
+﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+a {
+  color: #0077cc;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+
+/* ==============================================
+   LAYOUT SPECIFIC STYLES FROM SITE.CSS
+   ============================================== */
+
+/* Tổng thể */
+body {
+    background-color: #f4f4f4;
+    font-family: 'Roboto', Arial, sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+}
+
+/* HEADER */
+header {
+    background-color: #5a88ca;
+    box-shadow: 0 2px 5px rgba(90, 136, 202, 0.08);
+    padding-top: 20px;
+    font-size: 14px;
+}
+
+.header-top {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+}
+
+.logo img {
+    height: 75px;
+}
+
+.header-search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    flex: 1;
+    margin: 0 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    height: 40px;
+}
+
+.header-search-bar select,
+.header-search-bar input {
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+    height: 100%;
+}
+
+.header-search-bar select {
+    background-color: #f8f9fa;
+    max-width: 150px;
+}
+
+.header-search-bar input {
+    flex: 1;
+}
+
+.header-search-bar button {
+    background-color: #ffdf64;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 13px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Nút giỏ hàng */
+.header-cart {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.header-cart i {
+    font-size: 24px;
+    color: #333;
+}
+
+.header-cart .cart-count {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #ffdf64;
+    color: #333;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.cart-dropdown {
+    width: 300px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+.cart-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cart-item-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.cart-item-quantity,
+.cart-item-price {
+    font-size: 12px;
+    color: #666;
+}
+
+.cart-total {
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: right;
+}
+
+.header-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    position: relative;
+    cursor: pointer;
+    text-align: center;
+}
+
+.user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-name {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    display: none;
+    z-index: 1000;
+}
+
+.user-dropdown .dropdown-item {
+    padding: 10px 15px;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    display: block;
+}
+
+.user-dropdown .dropdown-item:hover {
+    background-color: #f4f4f4;
+}
+
+/* Hiển thị menu khi hover */
+.header-user:hover .user-dropdown {
+    display: block;
+}
+
+.header-cart:hover .cart-dropdown {
+    display: block;
+}
+
+.cart-dropdown:hover {
+    display: block;
+}
+
+/* NAVBAR */
+.navbar-custom {
+    background-color: #3a67a8;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: left;
+    gap: 15px;
+}
+
+.navbar-custom .nav-link {
+    color: #fff;
+    font-weight: 500;
+    padding: 10px 15px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+
+.navbar-custom .nav-link:hover {
+    background-color: #4a77b8; 
+}
+
+.navbar-custom .nav-link.active {
+    background-color: #ffdf64; 
+    font-weight: bold;
+    color: #333;
+}
+
+/* MAIN CONTENT */
+main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* FOOTER */
+footer {
+    background-color: #222;
+    color: #ccc;
+    padding: 30px 0;
+    font-size: 14px;
+}
+
+footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+footer h5 {
+    color: #fff;
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+footer ul {
+    list-style: none;
+    padding: 0;
+}
+
+footer ul li {
+    margin-bottom: 10px;
+}
+
+footer ul li a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-size: 13px;
+}
+
+footer ul li a:hover {
+    color: #f7d22d;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-top {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .header-search-bar {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .navbar-custom {
+        flex-direction: column;
+    }
+
+    .navbar-custom .nav-link {
+        display: block;
+        text-align: center;
+    }
+}

@@ -1,0 +1,207 @@
+@model HandmadeShop.Controllers.MomoViewModel
+@{
+    ViewBag.Title = "Thanh toán MoMo";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>@ViewBag.Title</title>
+<style>
+:root {
+  --bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --primary: #7c3aed;
+  --primary-600: #6d28d9;
+  --danger: #ef4444;
+  --border: #e5e7eb;
+  --success: #16a34a;
+  --shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans";
+  color: var(--text);
+  background: radial-gradient(1200px 800px at 90% -10%, #ede9fe, rgba(0,0,0,0) 60%), var(--bg);
+}
+.container {
+  max-width: 560px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 22px;
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.header .logo {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+}
+h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+.amount {
+  margin: 6px 0 16px;
+  font-size: 15px;
+}
+.amount strong { font-size: 18px; }
+.alert {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff7f7;
+  color: var(--danger);
+  margin-bottom: 12px;
+}
+.qr-wrapper {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+#qr-box {
+  width: 256px;
+  height: 256px;
+  display: grid;
+  place-items: center;
+  background: #fafafa;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 8px;
+}
+.helper {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 8px 0 2px;
+}
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .02s ease, box-shadow .2s ease, background-color .2s ease;
+  box-shadow: 0 2px 0 rgba(0,0,0,.05);
+  user-select: none;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.btn:active { transform: translateY(1px); box-shadow: none; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-600); }
+.btn-secondary { background: #f3f4f6; color: var(--text); border-color: #e5e7eb; }
+.btn-secondary:hover { background: #e9ebef; }
+#status {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+}
+#status .text-success { color: var(--success); font-weight: 600; }
+.footer-note {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+media (max-width: 400px) {
+  .card { padding: 16px; }
+  #qr-box { width: 220px; height: 220px; }
+}
+</style>
+</head>
+<body>
+  <div class="container" style="padding-top: 120px;">
+    <div class="card">
+      <div class="header">
+        <h3>Thanh toán MoMo cho đơn #@Model.OrderId</h3>
+      </div>
+
+      @if (!string.IsNullOrEmpty(Model.Error))
+      {
+          <div class="alert">@Model.Error</div>
+      }
+      else
+      {
+          <div class="amount">Số tiền: <strong>@String.Format("{0:N0}₫", Model.Amount)</strong></div>
+
+          <div class="qr-wrapper">
+              <div id="qr-box"></div>
+              <div class="helper">Quét QR bằng ứng dụng MoMo để thanh toán.</div>
+          </div>
+
+          <div class="actions">
+              <a class="btn btn-primary" href="@Model.PayUrl" target="_blank" rel="noopener" style="background: #FFCC00;">Mở MoMo / Thanh toán</a>
+              <a class="btn btn-secondary" href="@Url.Action("Purchase","User")">Quay lại đơn hàng</a>
+          </div>
+
+          <div id="status">Đang chờ thanh toán...</div>
+          <div class="footer-note">Vui lòng không đóng trang cho đến khi thanh toán hoàn tất.</div>
+
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+          <script>
+              (function () {
+                  var payUrl = "@Model.PayUrl";
+                  if (payUrl) {
+                      new QRCode(document.getElementById("qr-box"), {
+                          text: payUrl,
+                          width: 256,
+                          height: 256,
+                          correctLevel: QRCode.CorrectLevel.M
+                      });
+                  } else if ("@Model.QrCodeUrl") {
+                      var img = new Image();
+                      img.src = "@Model.QrCodeUrl";
+                      img.alt = "MoMo QR";
+                      img.referrerPolicy = "no-referrer";
+                      img.style = "max-width: 100%;";
+                      document.getElementById("qr-box").appendChild(img);
+                  } else {
+                      document.getElementById("qr-box").innerText = "Không có dữ liệu QR.";
+                  }
+              })();
+
+              const oid = @Model.OrderId;
+              const poll = setInterval(() => {
+                  fetch('@Url.Action("OrderPaidStatus","Payment")?id=' + oid, { credentials: 'include' })
+                      .then(r => r.json())
+                      .then(j => {
+                          if (j.ok && j.isPaid === true) {
+                              clearInterval(poll);
+                              document.getElementById('status').innerHTML = '<span class="text-success">Thanh toán thành công! Đang chuyển trang...</span>';
+                              setTimeout(() => {
+                                  window.location.href = '@Url.Action("OrderDetail","Checkout", new { id = Model.OrderId })';
+                              }, 800);
+                          }
+                      }).catch(() => {});
+              }, 3000);
+          </script>
+      }
+    </div>
+  </div>
+</body>
+</html>

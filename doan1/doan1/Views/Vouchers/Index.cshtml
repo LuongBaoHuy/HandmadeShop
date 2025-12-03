@@ -1,0 +1,775 @@
+@model IEnumerable<doan1.Models.Voucher>
+
+@{
+    ViewData["Title"] = "Quản lý voucher";
+}
+
+<style>
+    /* Import Google Fonts */
+    @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    /* CSS Variables */
+    :root {
+        --primary-blue: #0066cc;
+        --secondary-blue: #4da6ff;
+        --light-blue: #e6f3ff;
+        --dark-blue: #004499;
+        --ocean-blue: #1e88e5;
+        --sky-blue: #42a5f5;
+        
+        --white: #ffffff;
+        --light-gray: #f8f9fa;
+        --medium-gray: #e9ecef;
+        --dark-gray: #495057;
+        --text-primary: #2c3e50;
+        --text-secondary: #6c757d;
+        
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        
+        --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+        --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+        --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+        --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+        
+        --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+        --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+        --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+    }
+
+    /* Global Styles */
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        color: var(--text-primary);
+        margin: 0;
+        padding: 0;
+    }
+
+    .vouchers-container {
+        padding: 2rem 1rem;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
+
+    /* Page Header */
+    .page-header {
+        margin-bottom: 3rem;
+    }
+
+    .header-content {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        padding: 2.5rem;
+        box-shadow: var(--shadow-neumorphism);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .header-content::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--gradient-primary);
+        opacity: 0.1;
+        border-radius: 30px;
+    }
+
+    .header-title {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .title-left {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .title-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--gradient-primary);
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow-medium);
+    }
+
+    .title-icon i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .title-text h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin: 0;
+    }
+
+    .title-text p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin: 0.5rem 0 0;
+        font-weight: 400;
+    }
+
+    /* Glass Cards */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        box-shadow: var(--shadow-neumorphism);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        overflow: hidden;
+        margin-bottom: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-strong);
+    }
+
+    .glass-card .card-header {
+        padding: 1.5rem 2rem;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .glass-card .card-header h3 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-primary);
+    }
+
+    .glass-card .card-header i {
+        color: var(--primary-blue);
+        font-size: 1.3rem;
+    }
+
+    .glass-card .card-body {
+        padding: 2rem;
+    }
+
+    /* Form Styles */
+    .search-form {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr auto;
+        gap: 1.5rem;
+        align-items: end;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .glass-input, .glass-select {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 0.8rem 1rem;
+        width: 100%;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-light);
+    }
+
+    .glass-input:focus, .glass-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), var(--shadow-medium);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Glass Buttons */
+    .glass-btn {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 0.8rem 1.5rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: var(--text-primary);
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-light);
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        cursor: pointer;
+        border: none;
+    }
+
+    .glass-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--gradient-light);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+    }
+
+    .glass-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-medium);
+        text-decoration: none;
+        color: var(--text-primary);
+    }
+
+    .glass-btn:hover::before {
+        opacity: 1;
+    }
+
+    .glass-btn.primary {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .glass-btn.primary::before {
+        background: var(--gradient-secondary);
+    }
+
+    .glass-btn.success {
+        background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        color: white;
+    }
+
+    /* Small Glass Buttons */
+    .glass-btn-sm {
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: white;
+        font-size: 0.85rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-light);
+        margin: 0 2px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .glass-btn-sm:hover {
+        transform: translateY(-2px) scale(1.1);
+        box-shadow: var(--shadow-medium);
+        text-decoration: none;
+        color: white;
+    }
+
+    .glass-btn-sm.info {
+        background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+    }
+
+    .glass-btn-sm.warning {
+        background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+    }
+
+    .glass-btn-sm.danger {
+        background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+    }
+
+    /* Glass Badge */
+    .glass-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-light);
+        display: inline-block;
+    }
+
+    .glass-badge.success {
+        background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        color: white;
+    }
+
+    .glass-badge.danger {
+        background: linear-gradient(135deg, var(--danger) 0%, #f87171 100%);
+        color: white;
+    }
+
+    .glass-badge.warning {
+        background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        color: white;
+    }
+
+    .glass-badge.info {
+        background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        color: white;
+    }
+
+    .glass-badge.primary {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    /* Table Styles */
+    .table-container {
+        border-radius: 15px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    .glass-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .glass-table th {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        padding: 1.2rem 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-primary);
+        border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .glass-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        vertical-align: middle;
+    }
+
+    .glass-table tbody tr {
+        transition: all 0.3s ease;
+        opacity: 0;
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    .glass-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-light);
+    }
+
+    /* Voucher specific styles */
+    .voucher-code {
+        background: rgba(0, 102, 204, 0.1);
+        border: 1px solid rgba(0, 102, 204, 0.3);
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--primary-blue);
+        font-size: 0.9rem;
+    }
+
+    .discount-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.25rem;
+        justify-content: center;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: rgba(0, 102, 204, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: var(--primary-blue);
+        font-size: 3rem;
+    }
+
+    .empty-state h4 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Animations */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1400px) {
+        .search-form {
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+    }
+
+    @@media (max-width: 1200px) {
+        .search-form {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .header-title {
+            flex-direction: column;
+            gap: 2rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .vouchers-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .header-content {
+            padding: 2rem;
+        }
+
+        .title-text h1 {
+            font-size: 2rem;
+        }
+
+        .title-left {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .search-form {
+            grid-template-columns: 1fr;
+        }
+
+        .glass-table {
+            font-size: 0.8rem;
+        }
+
+        .glass-table th,
+        .glass-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    }
+</style>
+
+<div class="vouchers-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-left">
+                    <div class="title-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div class="title-text">
+                        <h1>Quản lý voucher</h1>
+                        <p>Tạo và quản lý các mã giảm giá cho khách hàng</p>
+                    </div>
+                </div>
+                <a asp-action="Create" class="glass-btn success">
+                    <i class="fas fa-plus"></i>
+                    <span>Thêm voucher mới</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Card -->
+    <div class="glass-card search-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-search"></i>
+                Tìm kiếm và lọc voucher
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label class="form-label">Từ khóa tìm kiếm</label>
+                    <input type="text" class="glass-input" name="searchTerm" 
+                           value="@ViewBag.SearchTerm" placeholder="Mã voucher, giá trị...">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Loại giảm giá</label>
+                    <select class="glass-select" name="discountType">
+                        <option value="">Tất cả loại</option>
+                        <option value="percent" selected="@(ViewBag.DiscountType == "percent")">Phần trăm</option>
+                        <option value="amount" selected="@(ViewBag.DiscountType == "amount")">Số tiền cố định</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="glass-select" name="isActive">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="true" selected="@(ViewBag.IsActive == "true")">Hoạt động</option>
+                        <option value="false" selected="@(ViewBag.IsActive == "false")">Vô hiệu hóa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tình trạng hết hạn</label>
+                    <select class="glass-select" name="expiryStatus">
+                        <option value="">Tất cả</option>
+                        <option value="active" selected="@(ViewBag.ExpiryStatus == "active")">Còn hiệu lực</option>
+                        <option value="expired" selected="@(ViewBag.ExpiryStatus == "expired")">Đã hết hạn</option>
+                        <option value="no-expiry" selected="@(ViewBag.ExpiryStatus == "no-expiry")">Không hết hạn</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Từ ngày</label>
+                    <input type="date" class="glass-input" name="fromDate" 
+                           value="@(ViewBag.FromDate?.ToString("yyyy-MM-dd"))">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Đến ngày</label>
+                    <input type="date" class="glass-input" name="toDate" 
+                           value="@(ViewBag.ToDate?.ToString("yyyy-MM-dd"))">
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="glass-btn primary">
+                        <i class="fas fa-search"></i>
+                        <span>Tìm kiếm</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Data Table Card -->
+    <div class="glass-card data-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-list"></i>
+                Danh sách voucher
+            </h3>
+            @if (ViewBag.TotalResults != null && ViewBag.TotalResults > 0)
+            {
+                <span class="glass-badge primary">@ViewBag.TotalResults kết quả</span>
+            }
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                @if (Model.Any())
+                {
+                    <table class="glass-table">
+                        <thead>
+                            <tr>
+                                <th>Mã voucher</th>
+                                <th>Loại giảm giá</th>
+                                <th>Giá trị</th>
+                                <th>Đơn tối thiểu</th>
+                                <th>Ngày hết hạn</th>
+                                <th>Đã sử dụng</th>
+                                <th>Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <span class="voucher-code">@item.Code</span>
+                                    </td>
+                                    <td>
+                                        @if (item.DiscountType == "percent")
+                                        {
+                                            <span class="glass-badge info">Phần trăm</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="glass-badge warning">Số tiền</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.DiscountType == "percent")
+                                        {
+                                            <span class="discount-value">@(item.DiscountValue)%</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="discount-value">@(item.DiscountValue.ToString("C", new System.Globalization.CultureInfo("vi-VN")))</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.MinOrderValue != null && item.MinOrderValue > 0)
+                                        {
+                                            <span style="font-weight: 500;">@item.MinOrderValue.Value.ToString("C", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #6c757d;">Không yêu cầu</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (item.ExpiryDate != null)
+                                        {
+                                            var today = DateOnly.FromDateTime(DateTime.Now);
+                                            var isExpired = item.ExpiryDate.Value < today;
+                                            <div style="color: @(isExpired ? "var(--danger)" : "var(--success)"); font-weight: 500;">
+                                                @item.ExpiryDate.Value.ToString("dd/MM/yyyy")
+                                                @if (isExpired)
+                                                {
+                                                    <div><small>(Đã hết hạn)</small></div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span style="color: #6c757d;">Không hết hạn</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="glass-badge primary">@(item.Orders?.Count ?? 0) lần</span>
+                                    </td>
+                                    <td>
+                                        @if (item.IsActive == true)
+                                        {
+                                            <span class="glass-badge success">Hoạt động</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="glass-badge danger">Vô hiệu hóa</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="glass-btn-sm info" title="Chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="glass-btn-sm warning" title="Sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="glass-btn-sm danger" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                        <h4>Không tìm thấy voucher nào</h4>
+                        <p>Chưa có voucher nào trong hệ thống hoặc không khớp với điều kiện tìm kiếm.</p>
+                        <a asp-action="Create" class="glass-btn success">
+                            <i class="fas fa-plus"></i>
+                            <span>Tạo voucher đầu tiên</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit form when filter changes
+        const form = document.getElementById('searchForm');
+        const selects = form.querySelectorAll('select, input[type="date"]');
+        
+        selects.forEach(function(element) {
+            element.addEventListener('change', function() {
+                form.submit();
+            });
+        });
+        
+        // Submit on Enter in search input
+        const searchInput = form.querySelector('input[name="searchTerm"]');
+        if (searchInput) {
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    form.submit();
+                }
+            });
+        }
+    });
+</script>

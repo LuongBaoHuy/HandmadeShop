@@ -1,0 +1,108 @@
+﻿@model HandmadeShop.Models.User
+@{
+    ViewBag.Title = "Userpage";
+}
+
+<div class="userpage-container">
+    <div class="userpage-sidebar">
+        <div class="userpage-avatar-block">
+            <img src="@(string.IsNullOrEmpty(Model.ProfileImageUrl) ? Url.Content("~/images/default-avatar.png") : Model.ProfileImageUrl)" alt="avatar" class="userpage-avatar-large" />
+            <div class="userpage-username">@Model.FullName</div>
+        </div>
+        <ul class="userpage-menu">
+            <li class="tab-link active" data-tab="account-tab"><a href="javascript:void(0)"><i class="fa fa-user"></i> Tài Khoản</a></li>
+            <li class="tab-link" data-tab="password-tab"><a href="javascript:void(0)"><i class="fa fa-lock"></i> Đổi Mật Khẩu</a></li>
+            <li><a href="@Url.Action("Purchase", "User")"><i class="fa fa-list"></i> Đơn Mua</a></li>
+        </ul>
+    </div>
+    <div class="userpage-content">
+        <h2>Hồ Sơ Của Tôi</h2>
+        <div class="userpage-desc">Quản lý thông tin hồ sơ để bảo mật tài khoản</div>
+        <div id="account-tab" class="tab-content" style="display:block;">
+            @using (Html.BeginForm("Update", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.HiddenFor(m => m.Id)
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Tên đăng nhập</div>
+                    <div class="userpage-form-input">
+                        @Model.Username
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Tên</div>
+                    <div class="userpage-form-input">
+                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Email</div>
+                    <div class="userpage-form-input">
+                        @Model.Email
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Số điện thoại</div>
+                    <div class="userpage-form-input">
+                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Thêm" })
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Ảnh đại diện</div>
+                    <div class="userpage-form-input">
+                        <input type="file" name="ProfileImage" accept="image/*" />
+                        <div class="userpage-form-note">Dung lượng file tối đa 5 MB. Định dạng: .JPEG, .PNG</div>
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label"></div>
+                    <div class="userpage-form-input">
+                        <button type="submit" class="btn btn-primary">Lưu</button>
+                    </div>
+                </div>
+            }
+        </div>
+        <div id="password-tab" class="tab-content" style="display:none;">
+            @using (Html.BeginForm("ChangePassword", "User", FormMethod.Post))
+            {
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Mật khẩu hiện tại</div>
+                    <div class="userpage-form-input">
+                        <input type="password" name="currentPassword" class="form-control" placeholder="Nhập mật khẩu hiện tại" />
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Mật khẩu mới</div>
+                    <div class="userpage-form-input">
+                        <input type="password" name="newPassword" class="form-control" placeholder="Nhập mật khẩu mới" />
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label">Xác nhận mật khẩu mới</div>
+                    <div class="userpage-form-input">
+                        <input type="password" name="confirmPassword" class="form-control" placeholder="Xác nhận mật khẩu mới" />
+                    </div>
+                </div>
+                <div class="userpage-form-row">
+                    <div class="userpage-form-label"></div>
+                    <div class="userpage-form-input">
+                        <button type="submit" class="btn btn-primary">Đổi Mật Khẩu</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+    document.querySelectorAll('.tab-link').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab-link').forEach(function(t) { t.classList.remove('active'); });
+            this.classList.add('active');
+            var tabId = this.getAttribute('data-tab');
+            document.querySelectorAll('.tab-content').forEach(function(content) {
+                content.style.display = 'none';
+            });
+            document.getElementById(tabId).style.display = 'block';
+        });
+    });
+</script>
+

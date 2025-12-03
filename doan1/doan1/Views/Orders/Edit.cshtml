@@ -1,0 +1,999 @@
+@model doan1.Models.Order
+
+@{
+    ViewData["Title"] = "Sửa đơn hàng";
+}
+
+<div class="orders-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h1>Chỉnh sửa đơn hàng #@Model.Id</h1>
+                <p>Cập nhật thông tin đơn hàng và trạng thái xử lý</p>
+            </div>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="glass-alert success">
+            <div class="alert-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="alert-content">
+                @TempData["Success"]
+            </div>
+            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="glass-alert error">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+                @TempData["Error"]
+            </div>
+            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    }
+
+    <div class="edit-container">
+        <div class="main-content">
+            <div class="glass-card edit-form-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-form"></i>
+                        Biểu mẫu chỉnh sửa
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" class="edit-form">
+                        <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <!-- Read-only Fields -->
+                        <div class="readonly-section">
+                            <h4>
+                                <i class="fas fa-lock"></i>
+                                Thông tin không thể thay đổi
+                            </h4>
+                            <div class="readonly-grid">
+                                <div class="readonly-item">
+                                    <label class="readonly-label">
+                                        <i class="fas fa-user"></i>
+                                        Khách hàng
+                                    </label>
+                                    <input type="hidden" asp-for="UserId" />
+                                    <div class="readonly-value">
+                                        <span class="customer-name">@(Model.User?.FullName ?? Model.User?.Username ?? "N/A")</span>
+                                    </div>
+                                </div>
+
+                                <div class="readonly-item">
+                                    <label class="readonly-label">
+                                        <i class="fas fa-ticket-alt"></i>
+                                        Voucher
+                                    </label>
+                                    <input type="hidden" asp-for="VoucherId" />
+                                    <div class="readonly-value">
+                                        @if (Model.Voucher != null)
+                                        {
+                                            <span class="voucher-code">@Model.Voucher.Code</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="no-voucher">Không có voucher</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="readonly-item">
+                                    <label class="readonly-label">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        Tổng tiền
+                                    </label>
+                                    <input type="hidden" asp-for="TotalPrice" />
+                                    <div class="readonly-value">
+                                        <span class="total-price">@Model.TotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                    </div>
+                                </div>
+
+                                <div class="readonly-item">
+                                    <label class="readonly-label">
+                                        <i class="fas fa-calendar"></i>
+                                        Ngày tạo
+                                    </label>
+                                    <input type="hidden" asp-for="CreatedAt" />
+                                    <div class="readonly-value">
+                                        <span class="created-date">@Html.DisplayFor(m => m.CreatedAt)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Editable Fields -->
+                        <div class="editable-section">
+                            <h4>
+                                <i class="fas fa-edit"></i>
+                                Thông tin có thể chỉnh sửa
+                            </h4>
+                            
+                            <div class="form-group">
+                                <label asp-for="Status" class="form-label">
+                                    <i class="fas fa-flag"></i>
+                                    Trạng thái đơn hàng
+                                </label>
+                                <select asp-for="Status" class="glass-select status-select">
+                                    @if (Model.Status == "Pending")
+                                    {
+                                        <option value="Pending">Chờ xử lý</option>
+                                        <option value="Confirmed">Đã xác nhận</option>
+                                    }
+                                    else if (Model.Status == "Confirmed")
+                                    {
+                                        <option value="Confirmed">Đã xác nhận</option>
+                                    }
+                                    else if (Model.Status == "Completed")
+                                    {
+                                        <option value="Completed" disabled>Hoàn thành (Không thể thay đổi)</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                                <div class="workflow-hint">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Quy trình:</strong> Admin chỉ xác nhận Pending → Confirmed. Khách hàng xác nhận Confirmed → Completed
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="form-label">
+                                    <i class="fas fa-sticky-note"></i>
+                                    Ghi chú đơn hàng
+                                </label>
+                                <textarea asp-for="Description" class="glass-textarea" rows="4" placeholder="Nhập ghi chú cho đơn hàng..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Information -->
+                        <div class="shipping-section">
+                            <h4>
+                                <i class="fas fa-shipping-fast"></i>
+                                Thông tin giao hàng
+                            </h4>
+                            
+                            <div class="shipping-grid">
+                                <div class="form-group">
+                                    <label asp-for="ShippingName" class="form-label">
+                                        <i class="fas fa-user"></i>
+                                        Tên người nhận
+                                    </label>
+                                    <input asp-for="ShippingName" class="glass-input" placeholder="Nhập tên người nhận" />
+                                    <span asp-validation-for="ShippingName" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="ShippingPhone" class="form-label">
+                                        <i class="fas fa-phone"></i>
+                                        Số điện thoại
+                                    </label>
+                                    <input asp-for="ShippingPhone" class="glass-input" placeholder="Nhập số điện thoại" />
+                                    <span asp-validation-for="ShippingPhone" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label asp-for="ShippingAddress" class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Địa chỉ giao hàng
+                                    </label>
+                                    <textarea asp-for="ShippingAddress" class="glass-textarea" rows="3" placeholder="Nhập địa chỉ giao hàng đầy đủ..."></textarea>
+                                    <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="glass-btn success large">
+                                <i class="fas fa-save"></i>
+                                <span>Cập nhật đơn hàng</span>
+                            </button>
+                            <a asp-action="Index" class="glass-btn secondary large">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Quay lại danh sách</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <div class="glass-card current-info-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-info-circle"></i>
+                        Thông tin hiện tại
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="info-items">
+                        <div class="info-item">
+                            <div class="info-icon order">
+                                <i class="fas fa-hashtag"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Mã đơn hàng</div>
+                                <div class="info-value">#@Model.Id</div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon status">
+                                @switch (Model.Status)
+                                {
+                                    case "Pending":
+                                        <i class="fas fa-clock"></i>
+                                        break;
+                                    case "Confirmed":
+                                        <i class="fas fa-check-circle"></i>
+                                        break;
+                                    case "Completed":
+                                        <i class="fas fa-star"></i>
+                                        break;
+                                    default:
+                                        <i class="fas fa-question"></i>
+                                        break;
+                                }
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Trạng thái</div>
+                                <div class="info-value">
+                                    @switch (Model.Status)
+                                    {
+                                        case "Pending":
+                                            <span class="status-badge pending">Chờ xử lý</span>
+                                            break;
+                                        case "Confirmed":
+                                            <span class="status-badge confirmed">Đã xác nhận</span>
+                                            break;
+                                        case "Completed":
+                                            <span class="status-badge completed">Hoàn thành</span>
+                                            break;
+                                        default:
+                                            <span class="status-badge unknown">@Model.Status</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon price">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="info-content">
+                                <div class="info-label">Tổng tiền</div>
+                                <div class="info-value">
+                                    <span class="price-display">@Model.TotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card warning-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Lưu ý quan trọng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="warning-content">
+                        <div class="warning-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="warning-text">
+                            <p>Hãy cẩn thận khi thay đổi thông tin đơn hàng, đặc biệt là trạng thái.</p>
+                            <ul class="warning-list">
+                                <li>Trạng thái ảnh hưởng đến quy trình xử lý</li>
+                                <li>Thông tin giao hàng cần chính xác</li>
+                                <li>Ghi chú giúp theo dõi đơn hàng</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .orders-container {
+            padding: 2rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        /* Glass Alerts */
+        .glass-alert {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-alert.success {
+            border-left: 4px solid var(--success);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .glass-alert.error {
+            border-left: 4px solid var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .glass-alert .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .glass-alert.success .alert-icon {
+            background: var(--success);
+        }
+
+        .glass-alert.error .alert-icon {
+            background: var(--danger);
+        }
+
+        .glass-alert .alert-content {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .glass-alert .alert-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .glass-alert .alert-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: var(--text-primary);
+        }
+
+        .edit-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Form Sections */
+        .readonly-section,
+        .editable-section,
+        .shipping-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .readonly-section:last-child,
+        .editable-section:last-child,
+        .shipping-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .readonly-section h4,
+        .editable-section h4,
+        .shipping-section h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .readonly-section h4 i {
+            color: var(--text-secondary);
+        }
+
+        .editable-section h4 i,
+        .shipping-section h4 i {
+            color: var(--primary-blue);
+        }
+
+        /* Readonly Grid */
+        .readonly-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .readonly-item {
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .readonly-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .readonly-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .customer-name {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .voucher-code {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .no-voucher {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .total-price {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .created-date {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-label i {
+            color: var(--primary-blue);
+        }
+
+        .glass-input,
+        .glass-select,
+        .glass-textarea {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            width: 100%;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-input:focus,
+        .glass-select:focus,
+        .glass-textarea:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1), var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .status-select {
+            font-weight: 500;
+        }
+
+        .workflow-hint {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .workflow-hint i {
+            color: var(--info);
+            margin-right: 0.5rem;
+        }
+
+        /* Shipping Grid */
+        .shipping-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .shipping-grid .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Glass Buttons */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .glass-btn.large {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.success {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+            color: white;
+        }
+
+        .glass-btn.success::before {
+            background: linear-gradient(135deg, #34d399 0%, var(--success) 100%);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Sidebar Info */
+        .info-items {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            box-shadow: var(--shadow-light);
+        }
+
+        .info-icon.order {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+        }
+
+        .info-icon.status {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .info-icon.price {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+        }
+
+        .status-badge.confirmed {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .status-badge.completed {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .status-badge.unknown {
+            background: linear-gradient(135deg, var(--text-secondary) 0%, #6b7280 100%);
+        }
+
+        .price-display {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Warning Card */
+        .warning-content {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .warning-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--warning) 0%, #fbbf24 100%);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+
+        .warning-text p {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .warning-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .warning-list li {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .warning-list li::before {
+            content: '•';
+            color: var(--warning);
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Validation */
+        .validation-summary {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            color: var(--danger);
+        }
+
+        .text-danger {
+            color: var(--danger) !important;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1200px) {
+            .edit-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-content {
+                order: -1;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .orders-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .readonly-grid,
+            .shipping-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .warning-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

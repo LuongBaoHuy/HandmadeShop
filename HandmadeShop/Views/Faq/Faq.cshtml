@@ -1,0 +1,95 @@
+﻿@{
+    ViewBag.Title = "Faq";
+    var chatMessages = ViewBag.ChatMessages as List<HandmadeShop.Models.Question>;
+    bool isLoggedIn = User.Identity.IsAuthenticated;
+}
+
+<h2>Chat Chung</h2>
+@if (isLoggedIn)
+{
+    <div class="faq-chat-box faq-chat-box-margin">
+        <form asp-action="SendChat" method="post" class="faq-form-container">
+            <input type="text" name="message" class="form-control faq-form-input" placeholder="Đặt câu hỏi hoặc gửi tin nhắn..." required />
+            <button type="submit" class="btn btn-primary faq-form-button">Gửi</button>
+        </form>
+    </div>
+}
+<div class="chat-box">
+    @if (chatMessages != null && chatMessages.Any())
+    {
+        foreach (var msg in chatMessages)
+        {
+            <div class="chat-message-card">
+                <div class="chat-message-header">
+                    <div class="chat-user-avatar">
+                        @if (!string.IsNullOrEmpty(msg.User?.ProfileImageUrl))
+                        {
+                            <img src="@msg.User.ProfileImageUrl" alt="avatar" />
+                        }
+                        else
+                        {
+                            @msg.User?.FullName?.Substring(0,1).ToUpper()
+                        }
+                    </div>
+                    <div class="chat-user-info">
+                        <strong>@msg.User?.FullName</strong>
+                        <span class="chat-time-span">@msg.CreatedAt?.ToString("HH:mm dd/MM")</span>
+                    </div>
+                </div>
+                <div class="chat-message-content">
+                    @msg.Content
+                </div>
+                @if (isLoggedIn)
+                {
+                    <div class="chat-reply-section">
+                        <button type="button" class="btn btn-link p-0" onclick="toggleReplyForm('question-@msg.Id')">Phản hồi</button>
+                        <form asp-action="Reply" method="post" class="chat-reply-form" id="reply-form-question-@msg.Id">
+                            <input type="hidden" name="questionId" value="@msg.Id" />
+                            <input type="hidden" name="parentAnswerId" value="" />
+                            <div class="chat-reply-form-container">
+                                <input type="text" name="content" class="form-control chat-reply-input" placeholder="Nhập phản hồi..." required />
+                                <button type="submit" class="btn btn-sm btn-danger">Gửi</button>
+                            </div>
+                        </form>
+                    </div>
+                }
+                @if (msg.Answers != null && msg.Answers.Any())
+                {
+                    <div class="chat-answers-section">
+                        <button type="button" class="btn btn-link p-0" onclick="toggleAnswers('answers-@msg.Id')">Xem phản hồi (@msg.Answers.Count)</button>
+                        <div id="answers-@msg.Id" class="chat-answers-container">
+                            @await Html.PartialAsync("_AnswerThread", Tuple.Create(msg.Answers.Cast<HandmadeShop.Models.Answer>(), (int?)null, 48, isLoggedIn))
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div>Chưa có tin nhắn nào.</div>
+    }
+
+    
+</div>
+
+@section Scripts {
+    <script>
+        function toggleReplyForm(id) {
+            var form = document.getElementById('reply-form-' + id);
+            if (form.style.display === 'none' || form.style.display === '') {
+                form.style.display = 'block';
+            } else {
+                form.style.display = 'none';
+            }
+        }
+        function toggleAnswers(id) {
+            var answers = document.getElementById(id);
+            if (answers.style.display === 'none' || answers.style.display === '') {
+                answers.style.display = 'block';
+            } else {
+                answers.style.display = 'none';
+            }
+        }
+    </script>
+}

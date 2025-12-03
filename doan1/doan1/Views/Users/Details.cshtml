@@ -1,0 +1,606 @@
+@model doan1.Models.User
+
+@{
+    ViewData["Title"] = "Chi tiết người dùng";
+}
+
+<div class="users-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h1>Chi tiết người dùng</h1>
+                <p>Thông tin đầy đủ về người dùng @Model.FullName</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-container">
+        <div class="glass-card profile-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-id-card"></i>
+                    Thông tin cá nhân
+                </h3>
+                <div class="profile-status">
+                    @if (!string.IsNullOrEmpty(Model.Role))
+                    {
+                        <span class="role-badge @Model.Role.ToLower()">@Model.Role</span>
+                    }
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="profile-layout">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-container">
+                            @if (!string.IsNullOrEmpty(Model.ProfileImageUrl))
+                            {
+                                <img src="@Model.ProfileImageUrl" alt="Profile" class="profile-avatar" />
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="profile-summary">
+                            <h4>@Model.FullName</h4>
+                            <p>@Model.Email</p>
+                            <span class="user-id-badge">#@Model.Id</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-details-section">
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <label>Tên đăng nhập</label>
+                                    <span>@Model.Username</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <label>Email</label>
+                                    <span>@Model.Email</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <label>Họ và tên</label>
+                                    <span>@Model.FullName</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <label>Số điện thoại</label>
+                                    <span>@(string.IsNullOrEmpty(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</span>
+                                </div>
+                            </div>
+
+                            <div class="detail-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <label>Vai trò</label>
+                                    <span>
+                                        @if (!string.IsNullOrEmpty(Model.Role))
+                                        {
+                                            <span class="role-badge @Model.Role.ToLower()">@Model.Role</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Chưa có vai trò</span>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="detail-item address-item">
+                                <div class="detail-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <label>Địa chỉ</label>
+                                    <span>@(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card actions-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-cogs"></i>
+                    Thao tác
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="action-buttons">
+                    <a asp-action="Index" class="glass-btn secondary large">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Quay lại danh sách</span>
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-btn warning large">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh sửa thông tin</span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-btn danger large">
+                        <i class="fas fa-trash"></i>
+                        <span>Xóa người dùng</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .users-container {
+            padding: 2rem 1rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .profile-avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .avatar-placeholder {
+            width: 150px;
+            height: 150px;
+            background: var(--gradient-secondary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .profile-summary h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .profile-summary p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .user-id-badge {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+        }
+
+        .profile-status {
+            position: relative;
+            z-index: 1;
+        }
+
+        .details-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .detail-item.address-item {
+            grid-column: 1 / -1;
+        }
+
+        .detail-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+            flex-shrink: 0;
+        }
+
+        .detail-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-content label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-content span {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .role-badge {
+            padding: 0.35rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+            display: inline-block;
+        }
+
+        .role-badge.admin {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .role-badge.customer {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .role-badge.manager {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .text-muted {
+            color: var(--text-secondary) !important;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            justify-content: center;
+        }
+
+        .glass-btn.large {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .glass-btn.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+        }
+
+        .glass-btn.warning::before {
+            background: linear-gradient(135deg, #fbbf24 0%, var(--warning) 100%);
+        }
+
+        .glass-btn.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .glass-btn.danger::before {
+            background: linear-gradient(135deg, #f87171 0%, var(--danger) 100%);
+        }
+
+        @@media (max-width: 768px) {
+            .users-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .profile-layout {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .details-grid {
+                gap: 1rem;
+            }
+
+            .detail-item {
+                padding: 1rem;
+            }
+
+            .profile-avatar,
+            .avatar-placeholder {
+                width: 120px;
+                height: 120px;
+            }
+
+            .avatar-placeholder {
+                font-size: 3rem;
+            }
+        }
+    </style>
+}

@@ -1,0 +1,64 @@
+﻿@model List<HandmadeShop.Models.Order>
+@{
+    ViewBag.Title = "Đơn đã đặt";
+}
+<h2>Danh sách đơn hàng đã đặt</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p>Bạn chưa có đơn hàng nào.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Đã nhận hàng</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@order.TotalPrice.ToString("N0") ₫</td>
+                <td>
+                    @if (order.Status == "Pending")
+                    {
+                        <span class="text-warning">Đang chờ xử lý</span>
+                    }
+                    else if (order.Status == "Confirmed")
+                    {
+                        <span class="text-success">Đã xác nhận</span>
+                    }
+                </td>
+                <td>
+                    @if (order.IsPaid)
+                    {
+                        <span class="text-success">Đã thanh toán</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Chưa thanh toán</span>
+                    }
+                </td>
+                <td>
+                    @if (order.Status == "Confirmed")
+                    {
+                        <form asp-action="MarkAsCompleted" asp-controller="User" method="post" style="display:inline;">
+                            <input type="hidden" name="orderId" value="@order.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Đã nhận hàng</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

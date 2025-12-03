@@ -1,0 +1,310 @@
+@model IEnumerable<doan1.Models.Product>
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+}
+
+<div class="products-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-box"></i>
+                </div>
+                <h1>Quản lý sản phẩm</h1>
+                <p>Quản lý và theo dõi tất cả sản phẩm trong hệ thống</p>
+            </div>
+            <a asp-action="Create" class="glass-btn primary">
+                <i class="fas fa-plus"></i>
+                <span>Thêm sản phẩm mới</span>
+            </a>
+        </div>
+        </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="glass-alert success">
+            <div class="alert-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="alert-content">
+                @TempData["Success"]
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="glass-alert error">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+                @TempData["Error"]
+            </div>
+            <button type="button" class="alert-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        }
+
+    <!-- Form tìm kiếm và lọc -->
+    <div class="glass-card search-card">
+        <div class="card-header">
+            <h3>
+                <i class="fas fa-search"></i>
+                Tìm kiếm và lọc sản phẩm
+            </h3>
+        </div>
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="search-form" id="searchForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="searchTerm" class="form-label">Từ khóa tìm kiếm</label>
+                        <div class="input-group">
+                            <div class="input-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                                <input type="text" class="glass-input" id="searchTerm" name="searchTerm" />
+                            </div>
+                    
+                    <div class="form-group">
+                        <label for="categoryId" class="form-label">Danh mục</label>
+                        <select class="glass-select" id="categoryId" name="categoryId">
+                            <option value="">Tất cả danh mục</option>
+                            @if (ViewBag.Categories != null)
+                            {
+                                @foreach (var category in (IEnumerable<SelectListItem>)ViewBag.Categories)
+                                {
+                                    <option value="@category.Value" selected="@(ViewBag.CategoryId?.ToString() == category.Value)">
+                                        @category.Text
+                                    </option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stockFilter" class="form-label">Tình trạng kho</label>
+                        <select class="glass-select" id="stockFilter" name="stockFilter">
+                            <option value="">Tất cả</option>
+                            <option value="in-stock" selected="@(ViewBag.StockFilter == "in-stock")">Còn hàng</option>
+                            <option value="out-of-stock" selected="@(ViewBag.StockFilter == "out-of-stock")">Hết hàng</option>
+                            <option value="low-stock" selected="@(ViewBag.StockFilter == "low-stock")">Sắp hết (≤10)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="priceRange" class="form-label">Khoảng giá</label>
+                        <select class="glass-select" id="priceRange" name="priceRange">
+                            <option value="">Tất cả giá</option>
+                            <option value="under-100k" selected="@(ViewBag.PriceRange == "under-100k")">Dưới 100K</option>
+                            <option value="100k-500k" selected="@(ViewBag.PriceRange == "100k-500k")">100K - 500K</option>
+                            <option value="500k-1m" selected="@(ViewBag.PriceRange == "500k-1m")">500K - 1M</option>
+                            <option value="over-1m" selected="@(ViewBag.PriceRange == "over-1m")">Trên 1M</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortBy" class="form-label">Sắp xếp theo</label>
+                        <select class="glass-select" id="sortBy" name="sortBy">
+                            <option value="id" selected="@(ViewBag.SortBy == "id")">ID</option>
+                            <option value="name" selected="@(ViewBag.SortBy == "name")">Tên sản phẩm</option>
+                            <option value="price" selected="@(ViewBag.SortBy == "price")">Giá</option>
+                            <option value="stock" selected="@(ViewBag.SortBy == "stock")">Tồn kho</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sortOrder" class="form-label">Thứ tự</label>
+                        <select class="glass-select" id="sortOrder" name="sortOrder">
+                            <option value="asc" selected="@(ViewBag.SortOrder == "asc")">Tăng dần</option>
+                            <option value="desc" selected="@(ViewBag.SortOrder == "desc")">Giảm dần</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="glass-btn primary">
+                            <i class="fas fa-search"></i>
+                            <span>Tìm kiếm</span>
+                        </button>
+                        <a href="@Url.Action("Index")" class="glass-btn secondary">
+                            <i class="fas fa-undo"></i>
+                            <span>Đặt lại</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="glass-card search-card compact-search-card">
+        <form method="get" asp-action="Index" class="search-form compact-form" id="searchForm">
+            <div class="compact-form-row">
+                <div class="form-group compact-group">
+                    <label for="searchTerm" class="form-label">Từ khóa</label>
+                    <div class="input-group">
+                        <span class="input-icon"><i class="fas fa-search"></i></span>
+                        <input type="text" class="glass-input" id="searchTerm" name="searchTerm" placeholder="Tìm kiếm..." value="@Context.Request.Query["searchTerm"]" />
+                    </div>
+                </div>
+                <div class="form-group compact-group">
+                    <label for="categoryId" class="form-label">Danh mục</label>
+                    <select class="glass-select" id="categoryId" name="categoryId">
+                        <option value="">Tất cả</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (var category in (IEnumerable<SelectListItem>)ViewBag.Categories)
+                            {
+                                <option value="@category.Value" selected="@(ViewBag.CategoryId?.ToString() == category.Value)">@category.Text</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group compact-group">
+                    <label for="stockFilter" class="form-label">Kho</label>
+                    <select class="glass-select" id="stockFilter" name="stockFilter">
+                        <option value="">Tất cả</option>
+                        <option value="in-stock" selected="@(ViewBag.StockFilter == "in-stock")">Còn hàng</option>
+                        <option value="out-of-stock" selected="@(ViewBag.StockFilter == "out-of-stock")">Hết hàng</option>
+                        <option value="low-stock" selected="@(ViewBag.StockFilter == "low-stock")">Sắp hết (≤10)</option>
+                    </select>
+                </div>
+                <div class="form-group compact-group">
+                    <label for="priceRange" class="form-label">Giá</label>
+                    <select class="glass-select" id="priceRange" name="priceRange">
+                        <option value="">Tất cả</option>
+                        <option value="under-100k" selected="@(ViewBag.PriceRange == "under-100k")">Dưới 100K</option>
+                        <option value="100k-500k" selected="@(ViewBag.PriceRange == "100k-500k")">100K - 500K</option>
+                        <option value="500k-1m" selected="@(ViewBag.PriceRange == "500k-1m")">500K - 1M</option>
+                        <option value="over-1m" selected="@(ViewBag.PriceRange == "over-1m")">Trên 1M</option>
+                    </select>
+                </div>
+                <div class="form-group compact-group">
+                    <label for="sortBy" class="form-label">Sắp xếp</label>
+                    <select class="glass-select" id="sortBy" name="sortBy">
+                        <option value="id" selected="@(ViewBag.SortBy == "id")">ID</option>
+                        <option value="name" selected="@(ViewBag.SortBy == "name")">Tên</option>
+                        <option value="price" selected="@(ViewBag.SortBy == "price")">Giá</option>
+                        <option value="stock" selected="@(ViewBag.SortBy == "stock")">Tồn kho</option>
+                    </select>
+                </div>
+                <div class="form-group compact-group">
+                    <label for="sortOrder" class="form-label">Thứ tự</label>
+                    <select class="glass-select" id="sortOrder" name="sortOrder">
+                        <option value="asc" selected="@(ViewBag.SortOrder == "asc")">Tăng dần</option>
+                        <option value="desc" selected="@(ViewBag.SortOrder == "desc")">Giảm dần</option>
+                    </select>
+                </div>
+                <div class="form-actions compact-actions">
+                    <button type="submit" class="glass-btn primary"><i class="fas fa-search"></i> Tìm kiếm</button>
+                    <a href="@Url.Action("Index")" class="glass-btn secondary"><i class="fas fa-undo"></i> Đặt lại</a>
+                </div>
+            </div>
+        </form>
+    </div>
+                        @if (Model != null && Model.Any())
+                        {
+                            <table class="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Danh mục</th>
+                                        <th>Giá</th>
+                                        <th>Tồn kho</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Id</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.CategoryId</td>
+                                            <td>@item.Price</td>
+                                            <td>@item.Stock</td>
+                                            <td class="action-buttons">
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="glass-btn-sm info" title="Xem chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="glass-btn-sm warning" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="glass-btn-sm danger" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+                                <h4>Không có sản phẩm nào</h4>
+                                <p>Hãy thử thay đổi bộ lọc hoặc thêm sản phẩm mới vào hệ thống.</p>
+                            </div>
+                        }
+
+    <script>
+        // Add smooth animations
+        document.addEventListener('DOMContentLoaded', function () {
+            const rows = document.querySelectorAll('.glass-table tbody tr');
+            rows.forEach((row, index) => {
+                row.style.animationDelay = `${index * 0.1}s`;
+                row.classList.add('fade-in-up');
+            });
+
+            // Load variation counts for all products
+            loadVariationCounts();
+
+            // Auto-dismiss alerts
+            setTimeout(() => {
+                document.querySelectorAll('.glass-alert').forEach(alert => {
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateX(100%)';
+                    setTimeout(() => alert.remove(), 300);
+                });
+            }, 5000);
+        });
+
+        // Function to load variation counts
+        function loadVariationCounts() {
+            const variationInfos = document.querySelectorAll('.variations-info');
+            variationInfos.forEach(info => {
+                const productId = info.getAttribute('data-product-id');
+                const countSpan = info.querySelector('.variation-count');
+                fetch(`/api/products/${productId}/variations`)
+                    .then(response => response.json())
+                    .then(variations => {
+                        if (variations.length > 0) {
+                            countSpan.innerHTML = `
+                                <i class="fas fa-palette"></i>
+                                ${variations.length} biến thể
+                            `;
+                            countSpan.className = 'variation-count has-variations';
+                        } else {
+                            countSpan.innerHTML = `
+                                <i class="fas fa-minus-circle"></i>
+                                Không có biến thể
+                            `;
+                            countSpan.className = 'variation-count no-variations';
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error loading variations for product ${productId}:`, error);
+                        countSpan.innerHTML = `
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Lỗi tải dữ liệu
+                        `;
+                        countSpan.className = 'variation-count error';
+                    });
+            });
+        }
+    </script>
+
+<link rel="stylesheet" href="~/css/products.css" />

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandmadeShop", "HandmadeShop\HandmadeShop.csproj", "{220F6050-EEF1-44A1-B7E7-1BB3B20EF31D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "doan1", "doan1\doan1\doan1.csproj", "{B27AA899-ECCA-E110-EE91-2777B04D26EE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{220F6050-EEF1-44A1-B7E7-1BB3B20EF31D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{220F6050-EEF1-44A1-B7E7-1BB3B20EF31D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{220F6050-EEF1-44A1-B7E7-1BB3B20EF31D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{220F6050-EEF1-44A1-B7E7-1BB3B20EF31D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B27AA899-ECCA-E110-EE91-2777B04D26EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B27AA899-ECCA-E110-EE91-2777B04D26EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B27AA899-ECCA-E110-EE91-2777B04D26EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B27AA899-ECCA-E110-EE91-2777B04D26EE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {988A889B-29AC-433B-B8C3-DBD2C1A9063A}
+	EndGlobalSection
+EndGlobal

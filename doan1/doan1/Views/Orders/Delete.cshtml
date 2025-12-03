@@ -1,0 +1,1045 @@
+@model doan1.Models.Order
+
+@{
+    ViewData["Title"] = "Xóa đơn hàng";
+}
+
+<div class="orders-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h1>Xác nhận xóa đơn hàng #@Model.Id</h1>
+                <p>Thao tác này không thể hoàn tác và sẽ xóa vĩnh viễn đơn hàng</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="delete-container">
+        <div class="main-content">
+            <div class="glass-card warning-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Cảnh báo quan trọng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="warning-message">
+                        <div class="warning-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="warning-text">
+                            <h4>Bạn có chắc chắn muốn xóa đơn hàng này không?</h4>
+                            <p>Hành động này sẽ xóa vĩnh viễn đơn hàng và không thể hoàn tác. Tất cả thông tin liên quan sẽ bị mất.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card order-info-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-receipt"></i>
+                        Thông tin đơn hàng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="order-details-grid">
+                        <div class="detail-item primary">
+                            <div class="detail-icon">
+                                <i class="fas fa-hashtag"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Mã đơn hàng</div>
+                                <div class="detail-value">
+                                    <span class="order-id">#@Model.Id</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Khách hàng</div>
+                                <div class="detail-value">
+                                    @if (Model.User != null)
+                                    {
+                                        <div class="customer-info">
+                                            <div class="customer-name">@Model.User.FullName</div>
+                                            <div class="customer-email">@Model.User.Email</div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-data">Không xác định</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Tổng tiền</div>
+                                <div class="detail-value">
+                                    <span class="total-price">@Model.TotalPrice.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                @switch (Model.Status)
+                                {
+                                    case "Pending":
+                                        <i class="fas fa-clock"></i>
+                                        break;
+                                    case "Confirmed":
+                                        <i class="fas fa-check-circle"></i>
+                                        break;
+                                    case "Completed":
+                                        <i class="fas fa-star"></i>
+                                        break;
+                                    default:
+                                        <i class="fas fa-question"></i>
+                                        break;
+                                }
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Trạng thái</div>
+                                <div class="detail-value">
+                                    @switch (Model.Status)
+                                    {
+                                        case "Pending":
+                                            <span class="status-badge pending">Chờ xử lý</span>
+                                            break;
+                                        case "Confirmed":
+                                            <span class="status-badge confirmed">Đã xác nhận</span>
+                                            break;
+                                        case "Completed":
+                                            <span class="status-badge completed">Hoàn thành</span>
+                                            break;
+                                        default:
+                                            <span class="status-badge unknown">@Model.Status</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-calendar"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Ngày tạo</div>
+                                <div class="detail-value">
+                                    @if (Model.CreatedAt.HasValue)
+                                    {
+                                        <span class="created-date">
+                                            @Model.CreatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-item">
+                            <div class="detail-icon">
+                                <i class="fas fa-ticket-alt"></i>
+                            </div>
+                            <div class="detail-content">
+                                <div class="detail-label">Voucher</div>
+                                <div class="detail-value">
+                                    @if (Model.Voucher != null)
+                                    {
+                                        <span class="voucher-info">
+                                            <i class="fas fa-check"></i>
+                                            Có sử dụng voucher
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="no-data">Không sử dụng voucher</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            <div class="detail-item full-width">
+                                <div class="detail-icon">
+                                    <i class="fas fa-sticky-note"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <div class="detail-label">Ghi chú</div>
+                                    <div class="detail-value">
+                                        <div class="description-text">@Model.Description</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    @if (Model.OrderItems != null && Model.OrderItems.Any())
+                    {
+                        <div class="order-items-section">
+                            <h4>
+                                <i class="fas fa-shopping-bag"></i>
+                                Sản phẩm trong đơn hàng (@Model.OrderItems.Count() sản phẩm)
+                            </h4>
+                            <div class="order-items-list">
+                                @foreach (var item in Model.OrderItems.Take(5))
+                                {
+                                    <div class="order-item">
+                                        <div class="item-icon">
+                                            <i class="fas fa-box"></i>
+                                        </div>
+                                        <div class="item-content">
+                                            <div class="item-name">
+                                                @if (item.Product != null)
+                                                {
+                                                    @item.Product.Name
+                                                }
+                                                else
+                                                {
+                                                    <span class="no-data">Sản phẩm không xác định</span>
+                                                }
+                                            </div>
+                                            <div class="item-quantity">Số lượng: @item.Quantity</div>
+                                        </div>
+                                    </div>
+                                }
+                                @if (Model.OrderItems.Count() > 5)
+                                {
+                                    <div class="more-items">
+                                        <i class="fas fa-ellipsis-h"></i>
+                                        và @(Model.OrderItems.Count() - 5) sản phẩm khác
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    <div class="delete-actions">
+                        <form asp-action="Delete" class="delete-form">
+                            <input type="hidden" asp-for="Id" />
+                            <button type="submit" class="glass-btn danger large delete-btn">
+                                <i class="fas fa-trash"></i>
+                                <span>Xóa đơn hàng vĩnh viễn</span>
+                            </button>
+                            <a asp-action="Index" class="glass-btn secondary large">
+                                <i class="fas fa-arrow-left"></i>
+                                <span>Hủy bỏ</span>
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-content">
+            <div class="glass-card danger-notes-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Lưu ý quan trọng
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="danger-notes">
+                        <div class="danger-note">
+                            <div class="note-icon">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="note-text">
+                                <strong>Xóa vĩnh viễn</strong>
+                                <p>Đơn hàng sẽ bị xóa hoàn toàn khỏi hệ thống</p>
+                            </div>
+                        </div>
+
+                        <div class="danger-note">
+                            <div class="note-icon">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="note-text">
+                                <strong>Sản phẩm bị ảnh hưởng</strong>
+                                <p>Tất cả sản phẩm trong đơn hàng sẽ bị xóa</p>
+                            </div>
+                        </div>
+
+                        <div class="danger-note">
+                            <div class="note-icon">
+                                <i class="fas fa-undo-alt"></i>
+                            </div>
+                            <div class="note-text">
+                                <strong>Không thể hoàn tác</strong>
+                                <p>Không có cách nào để khôi phục sau khi xóa</p>
+                            </div>
+                        </div>
+
+                        <div class="danger-note">
+                            <div class="note-icon">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <div class="note-text">
+                                <strong>Dữ liệu liên quan</strong>
+                                <p>Tất cả thông tin và lịch sử sẽ bị mất</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="confirmation-reminder">
+                        <div class="reminder-icon">
+                            <i class="fas fa-lightbulb"></i>
+                        </div>
+                        <div class="reminder-text">
+                            <strong>Khuyến nghị:</strong> Hãy cân nhắc kỹ lưỡng trước khi thực hiện thao tác xóa. Có thể bạn muốn chỉ thay đổi trạng thái đơn hàng thay vì xóa hoàn toàn.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card alternative-actions-card">
+                <div class="card-header">
+                    <h3>
+                        <i class="fas fa-lightbulb"></i>
+                        Thay thế khác
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alternative-actions">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="alternative-action">
+                            <div class="action-icon">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <div class="action-content">
+                                <div class="action-title">Chỉnh sửa đơn hàng</div>
+                                <div class="action-desc">Thay đổi thông tin thay vì xóa</div>
+                            </div>
+                        </a>
+
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="alternative-action">
+                            <div class="action-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="action-content">
+                                <div class="action-title">Xem chi tiết</div>
+                                <div class="action-desc">Kiểm tra thông tin một lần nữa</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+            --gradient-danger: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #f97316 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .orders-container {
+            padding: 2rem 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-danger);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-danger);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-danger);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .delete-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        /* Warning Card */
+        .warning-card .card-header i {
+            color: var(--danger);
+        }
+
+        .warning-message {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .warning-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-danger);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+
+        .warning-text h4 {
+            color: var(--danger);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .warning-text p {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* Order Info */
+        .order-info-card .card-header i {
+            color: var(--primary-blue);
+        }
+
+        .order-details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .detail-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-item.primary {
+            background: rgba(30, 136, 229, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .detail-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-light);
+            flex-shrink: 0;
+            background: var(--gradient-primary);
+        }
+
+        .detail-content {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .order-id {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .customer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .customer-name {
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .customer-email {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .total-price {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: white;
+        }
+
+        .status-badge.pending {
+            background: var(--gradient-warning);
+        }
+
+        .status-badge.confirmed {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .status-badge.completed {
+            background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+        }
+
+        .status-badge.unknown {
+            background: linear-gradient(135deg, var(--text-secondary) 0%, #6b7280 100%);
+        }
+
+        .created-date {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .voucher-info {
+            color: var(--warning);
+            font-weight: 500;
+        }
+
+        .voucher-info i {
+            margin-right: 0.5rem;
+        }
+
+        .no-data {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .description-text {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            padding: 1rem;
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Order Items */
+        .order-items-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-items-section h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .order-items-section h4 i {
+            color: var(--primary-blue);
+        }
+
+        .order-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .order-item {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-secondary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .item-content {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .item-quantity {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .more-items {
+            background: rgba(108, 117, 125, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .more-items i {
+            margin-right: 0.5rem;
+            color: var(--primary-blue);
+        }
+
+        /* Delete Actions */
+        .delete-actions {
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            padding-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .glass-btn.large {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.danger {
+            background: var(--gradient-danger);
+            color: white;
+        }
+
+        .glass-btn.danger::before {
+            background: linear-gradient(135deg, #dc2626 0%, var(--danger) 100%);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Sidebar */
+        .danger-notes-card .card-header i {
+            color: var(--danger);
+        }
+
+        .danger-notes {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .danger-note {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid var(--danger);
+            border-radius: 0 12px 12px 0;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .note-icon {
+            width: 30px;
+            height: 30px;
+            background: var(--gradient-danger);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .note-text strong {
+            color: var(--danger);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .note-text p {
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .confirmation-reminder {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--info);
+            border-radius: 0 12px 12px 0;
+            padding: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .reminder-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .reminder-text {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .reminder-text strong {
+            color: var(--info);
+        }
+
+        /* Alternative Actions */
+        .alternative-actions-card .card-header i {
+            color: var(--info);
+        }
+
+        .alternative-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .alternative-action {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .alternative-action:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .action-content {
+            flex: 1;
+        }
+
+        .action-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .action-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 1200px) {
+            .delete-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-content {
+                order: -1;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .orders-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .order-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .delete-actions {
+                flex-direction: column;
+            }
+
+            .warning-message {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+}

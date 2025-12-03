@@ -1,0 +1,436 @@
+@model doan1.Models.Question
+
+@{
+    ViewData["Title"] = "Chi tiết câu hỏi";
+}
+
+@section Styles {
+    <style>
+        body {
+            background: #ffffff;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .glass-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid rgba(224, 230, 237, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .neuro-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 
+                8px 8px 16px rgba(163, 177, 198, 0.4),
+                -8px -8px 16px rgba(255, 255, 255, 0.9);
+            border: none;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .neuro-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                12px 12px 24px rgba(163, 177, 198, 0.5),
+                -12px -12px 24px rgba(255, 255, 255, 1);
+        }
+        
+        .answer-card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 
+                6px 6px 12px rgba(163, 177, 198, 0.4),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+            border: none;
+            margin-bottom: 1rem;
+            border-left: 4px solid #1e3a8a;
+        }
+        
+        .btn-neuro {
+            background: #ffffff;
+            border: none;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: #1e3a8a;
+            box-shadow: 
+                6px 6px 12px rgba(163, 177, 198, 0.4),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-neuro:hover {
+            color: #3b82f6;
+            box-shadow: 
+                3px 3px 6px rgba(163, 177, 198, 0.4),
+                -3px -3px 6px rgba(255, 255, 255, 0.8);
+            transform: translateY(1px);
+        }
+        
+        .btn-primary-neuro {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 
+                6px 6px 12px rgba(59, 130, 246, 0.4),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-neuro:hover {
+            color: white;
+            box-shadow: 
+                3px 3px 6px rgba(59, 130, 246, 0.4),
+                -3px -3px 6px rgba(255, 255, 255, 0.8);
+            transform: translateY(1px);
+        }
+        
+        .btn-success-neuro {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 
+                6px 6px 12px rgba(16, 185, 129, 0.4),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary-neuro {
+            background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 
+                6px 6px 12px rgba(107, 114, 128, 0.4),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-warning-neuro {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 
+                6px 6px 12px rgba(251, 191, 36, 0.4),
+                -6px -6px 12px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+        }
+        
+        .form-neuro {
+            background: #ffffff;
+            border: none;
+            border-radius: 15px;
+            padding: 12px 16px;
+            box-shadow: 
+                inset 4px 4px 8px rgba(163, 177, 198, 0.2),
+                inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+        
+        .form-neuro:focus {
+            box-shadow: 
+                inset 6px 6px 12px rgba(163, 177, 198, 0.3),
+                inset -6px -6px 12px rgba(255, 255, 255, 0.9),
+                0 0 0 3px rgba(30, 58, 138, 0.1);
+            outline: none;
+        }
+        
+        .badge-neuro {
+            border-radius: 12px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .badge-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: white;
+        }
+        
+        .badge-answered {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+        }
+        
+        .badge-closed {
+            background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+            color: white;
+        }
+        
+        .header-title {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .sidebar-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 
+                8px 8px 16px rgba(163, 177, 198, 0.4),
+                -8px -8px 16px rgba(255, 255, 255, 0.9);
+            border: none;
+            margin-bottom: 1.5rem;
+        }
+        
+        .question-content {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 1.5rem;
+            border-left: 4px solid #1e3a8a;
+            margin: 1rem 0;
+        }
+        
+        .answer-content {
+            background: #f0fdf4;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+        
+        .no-answers {
+            background: rgba(248, 250, 252, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            border: 1px solid rgba(224, 230, 237, 0.3);
+        }
+    </style>
+}
+
+<div class="container-fluid" style="min-height: 100vh; padding: 2rem;">
+    @if (TempData["QuestionsError"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show glass-container border-0" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>@TempData["QuestionsError"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    <!-- Question Content -->
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Question Card -->
+            <div class="glass-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="header-title">
+                            <i class="fas fa-question-circle me-3"></i>Chi tiết câu hỏi
+                        </h2>
+                    </div>
+                    <div>
+                        @switch(Model.Status)
+                        {
+                            case "Pending":
+                                <span class="badge badge-neuro badge-pending">
+                                    <i class="fas fa-clock me-2"></i>Chờ trả lời
+                                </span>
+                                break;
+                            case "Answered":
+                                <span class="badge badge-neuro badge-answered">
+                                    <i class="fas fa-check me-2"></i>Đã trả lời
+                                </span>
+                                break;
+                            case "Closed":
+                                <span class="badge badge-neuro badge-closed">
+                                    <i class="fas fa-times me-2"></i>Đã đóng
+                                </span>
+                                break;
+                        }
+                    </div>
+                </div>
+                
+                <div class="question-content">
+                    <div class="mb-3">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong class="text-primary">Người hỏi:</strong> 
+                                <span class="fw-semibold">@ViewBag.AskerName</span>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <strong class="text-primary">Ngày tạo:</strong> 
+                                <span class="fw-semibold">@Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="question-text fs-5" style="line-height: 1.7; color: #2d3748;">
+                        @Html.Raw(Model.Content.Replace("\n", "<br>"))
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answers Section -->
+            <div class="glass-container">
+                <h4 class="header-title mb-4">
+                    <i class="fas fa-comments me-3"></i>Câu trả lời
+                </h4>
+                
+                @{ var userDict = ViewBag.UserDict as Dictionary<int, string>; }
+                @if (ViewBag.Answers != null && ((List<doan1.Models.Answer>)ViewBag.Answers).Any())
+                {
+                    var answers = (List<doan1.Models.Answer>)ViewBag.Answers;
+                    foreach (var answer in answers.OrderBy(a => a.CreatedAt))
+                    {
+                        <div class="answer-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <strong class="text-success">
+                                            <i class="fas fa-user-circle me-2"></i>@(userDict != null && userDict.ContainsKey(answer.UserId) ? userDict[answer.UserId] : $"UserId: {answer.UserId}")
+                                        </strong>
+                                    </div>
+                                    <span class="text-muted fw-semibold">
+                                        <i class="fas fa-clock me-1"></i>@answer.CreatedAt?.ToString("dd/MM/yyyy HH:mm")
+                                    </span>
+                                </div>
+                                <div class="answer-content">
+                                    @Html.Raw(answer.Content.Replace("\n", "<br>"))
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-answers">
+                        <i class="fas fa-comments fa-4x text-muted mb-3" style="opacity: 0.3;"></i>
+                        <h5 class="text-muted mb-3">Chưa có câu trả lời nào</h5>
+                        <p class="text-muted">Hãy là người đầu tiên trả lời câu hỏi này</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Add Answer Form -->
+            <div class="glass-container">
+                <h4 class="header-title mb-4">
+                    <i class="fas fa-plus-circle me-3"></i>Thêm câu trả lời
+                </h4>
+                
+                <form asp-action="AddAnswer" method="post">
+                    <input type="hidden" name="questionId" value="@Model.Id" />
+                    <div class="mb-4">
+                        <label for="content" class="form-label fw-semibold fs-5">Nội dung câu trả lời</label>
+                        <textarea name="content" id="content" class="form-control form-neuro" rows="6" 
+                                  placeholder="Nhập câu trả lời của bạn..." required style="min-height: 150px;"></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary-neuro btn-lg">
+                            <i class="fas fa-paper-plane me-2"></i>Gửi câu trả lời
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Status Actions -->
+            <div class="sidebar-card">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h5 class="header-title mb-0">
+                        <i class="fas fa-cogs me-2"></i>Thao tác
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Status != "Answered")
+                    {
+                        <form asp-action="UpdateStatus" method="post" class="mb-3">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="Answered" />
+                            <button type="submit" class="btn btn-success-neuro w-100">
+                                <i class="fas fa-check me-2"></i>Đánh dấu đã trả lời
+                            </button>
+                        </form>
+                    }
+                    
+                    @if (Model.Status != "Closed")
+                    {
+                        <form asp-action="UpdateStatus" method="post" class="mb-3">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="Closed" />
+                            <button type="submit" class="btn btn-secondary-neuro w-100">
+                                <i class="fas fa-times me-2"></i>Đóng câu hỏi
+                            </button>
+                        </form>
+                    }
+                    
+                    @if (Model.Status == "Closed")
+                    {
+                        <form asp-action="UpdateStatus" method="post" class="mb-3">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="status" value="Pending" />
+                            <button type="submit" class="btn btn-warning-neuro w-100">
+                                <i class="fas fa-undo me-2"></i>Mở lại
+                            </button>
+                        </form>
+                    }
+                    
+                    <a href="@Url.Action("Index")" class="btn btn-neuro w-100">
+                        <i class="fas fa-arrow-left me-2"></i>Về danh sách
+                    </a>
+                </div>
+            </div>
+
+            <!-- Question Info -->
+            <div class="sidebar-card">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <h5 class="header-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Thông tin câu hỏi
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="info-item mb-3">
+                        <strong class="text-primary">ID:</strong>
+                        <span class="fw-semibold">#@Model.Id</span>
+                    </div>
+                    <div class="info-item mb-3">
+                        <strong class="text-primary">Trạng thái:</strong>
+                        <div class="mt-1">
+                            @switch(Model.Status)
+                            {
+                                case "Pending":
+                                    <span class="badge badge-neuro badge-pending">Chờ trả lời</span>
+                                    break;
+                                case "Answered":
+                                    <span class="badge badge-neuro badge-answered">Đã trả lời</span>
+                                    break;
+                                case "Closed":
+                                    <span class="badge badge-neuro badge-closed">Đã đóng</span>
+                                    break;
+                            }
+                        </div>
+                    </div>
+                    <div class="info-item mb-3">
+                        <strong class="text-primary">Người hỏi:</strong>
+                        <span class="fw-semibold">@ViewBag.AskerName</span>
+                    </div>
+                    <div class="info-item">
+                        <strong class="text-primary">Ngày tạo:</strong>
+                        <span class="fw-semibold">@Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

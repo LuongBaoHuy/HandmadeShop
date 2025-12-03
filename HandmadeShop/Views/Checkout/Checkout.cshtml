@@ -1,0 +1,219 @@
+﻿@model HandmadeShop.Models.Order
+
+@{
+    ViewBag.Title = "Checkout";
+    var cartItems = ViewBag.CartItems as List<HandmadeShop.Models.CartItem>;
+}
+
+@if (TempData["OrderSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 350px;">
+        @TempData["OrderSuccess"]
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="this.parentElement.style.display='none';">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+}
+
+<h2 class="mb-4">Thanh toán đơn hàng</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-7">
+        <form method="post" asp-action="Checkout" id="checkout-form">
+            @Html.AntiForgeryToken()
+            @if ((bool)(ViewBag.IsBuyNow ?? false))
+            {
+                <!-- Buy-now hidden fields -->
+                <input type="hidden" name="isBuyNow" id="IsBuyNow" value="true" />
+                <input type="hidden" name="productId" id="BuyNowProductId" value="@ViewBag.BuyNowProductId" />
+                <input type="hidden" name="quantity" id="BuyNowQuantity" value="@ViewBag.BuyNowQuantity" />
+                <input type="hidden" name="variationId" id="BuyNowVariationId" value="@(ViewBag.BuyNowVariationId ?? "")" />
+            }
+            else
+            {
+                <input type="hidden" id="IsBuyNow" value="false" />
+            }
+            <div class="form-group">
+                <label for="FullName">Họ và tên</label>
+                <input type="text" class="form-control" id="FullName" name="FullName" placeholder="Nhập họ và tên" value="@ViewBag.FullName" required />
+            </div>
+            <div class="form-group">
+                <label for="Phone">Số điện thoại</label>
+                <input type="tel" class="form-control" id="Phone" name="Phone" placeholder="Nhập số điện thoại" value="@ViewBag.Phone" required />
+            </div>
+            <div class="form-group">
+                <label for="Address">Địa chỉ giao hàng</label>
+                <input type="text" class="form-control" id="Address" name="Address" placeholder="Nhập địa chỉ" value="@ViewBag.Address" required />
+            </div>
+            <div class="form-group">
+                <label for="VoucherCode">Mã giảm giá (nếu có)</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="VoucherCode" name="VoucherCode" placeholder="Nhập mã giảm giá" />
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" id="btn-apply-voucher">Áp dụng</button>
+                    </div>
+                </div>
+                <div id="voucher-message" class="mt-2"></div>
+            </div>
+            <div class="form-group">
+                <label for="Note">Ghi chú</label>
+                <textarea class="form-control" id="Note" name="Note" rows="3" placeholder="Ghi chú cho đơn hàng"></textarea>
+            </div>
+            <h5 class="mt-4">Phương thức thanh toán</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="PaymentMethod" id="cod" value="COD" checked>
+                <label class="form-check-label" for="cod">
+                    Thanh toán khi nhận hàng (COD)
+                </label>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="radio" name="PaymentMethod" id="bank" value="Bank">
+                <label class="form-check-label" for="bank">
+                    Chuyển khoản ngân hàng
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Đặt hàng</button>
+        </form>
+    </div>
+    <div class="col-md-5">
+        <h4>Thông tin đơn hàng</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Phân loại</th> <!-- Thêm cột này -->
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (ViewBag.CartItems != null)
+            {
+                foreach (var item in cartItems)
+                {
+                    HandmadeShop.Models.ProductVariation? variation = null;
+                    decimal price = 0;
+                    decimal discountRate = item.Product.DiscountedPrice ?? 0;
+                    string variationText = "Không phân loại";
+                    if (item.VariantId != null && item.Product.ProductVariations != null)
+                    {
+                        variation = item.Product.ProductVariations.FirstOrDefault(v => v.Id == item.VariantId.Value);
+                        if (variation != null)
+                        {
+                            price = (discountRate > 0) ? variation.Price * (1 - discountRate) : variation.Price;
+                            if (!string.IsNullOrEmpty(variation.CombinationHash))
+                            {
+                                variationText = variation.CombinationHash;
+                            }
+                        }
+                        else
+                        {
+                            price = (discountRate > 0) ? (item.Product.Price ?? 0) * (1 - discountRate) : (item.Product.Price ?? 0);
+                        }
+                    }
+                    else
+                    {
+                        price = (discountRate > 0) ? (item.Product.Price ?? 0) * (1 - discountRate) : (item.Product.Price ?? 0);
+                    }
+                    <tr>
+                        <td>@item.Product.Name</td>
+                        <td>@variationText</td>
+                        <td>@item.Quantity</td>
+                        <td>@String.Format("{0:N0}₫", price)</td>
+                        <td>@String.Format("{0:N0}₫", price * item.Quantity)</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center">Không có sản phẩm trong giỏ hàng.</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        <div class="text-right" id="order-summary">
+            <strong>Tạm tính: </strong> @String.Format("{0:N0}₫", ViewBag.Total ?? 0)<br />
+            @if ((ViewBag.Discount ?? 0) > 0)
+            {
+                // Hiển thị chi tiết mức giảm của voucher
+                <span class="text-info">
+                    Voucher giảm: 
+                    @if (ViewBag.VoucherType == "percent")
+                    {
+                        @($"{(decimal.Parse(ViewBag.VoucherValue.ToString()) * 100):N0}% (-{String.Format("{0:N0}₫", ViewBag.Discount)})")
+                    }
+                    else
+                    {
+                        @($"-{String.Format("{0:N0}₫", ViewBag.Discount)}")
+                    }
+                </span><br />
+                <strong>Thành tiền: </strong> @String.Format("{0:N0}₫", ViewBag.TotalAfterDiscount)
+            }
+            else
+            {
+                <strong>Thành tiền: </strong> @String.Format("{0:N0}₫", ViewBag.Total ?? 0)
+            }
+        </div>
+    </div>
+</div>
+
+
+<!-- Thêm jQuery trước -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Trim mã voucher khi submit form để coi như không nhập nếu chỉ có khoảng trắng
+    $('#checkout-form').on('submit', function () {
+        const code = ($('#VoucherCode').val() || '').trim();
+        $('#VoucherCode').val(code); // rỗng nếu chỉ là khoảng trắng -> server bỏ qua
+    });
+
+    $('#btn-apply-voucher').click(function () {
+        var code = $('#VoucherCode').val().trim();
+        if (!code) {
+            $('#voucher-message').html('<span class="text-danger">Vui lòng nhập mã giảm giá.</span>');
+            return;
+        }
+
+        const payload = { voucherCode: code };
+        if ($('#IsBuyNow').val() === 'true') {
+            payload.isBuyNow = true;
+            payload.productId = parseInt($('#BuyNowProductId').val());
+            payload.quantity = parseInt($('#BuyNowQuantity').val());
+            const varId = $('#BuyNowVariationId').val();
+            payload.variationId = varId ? parseInt(varId) : null;
+        }
+
+        $.post('@Url.Action("ApplyVoucher", "Checkout")', payload, function (res) {
+            if (res.success) {
+                $('#voucher-message').html('<span class="text-success">' + res.message + '</span>');
+                let voucherDetail = '';
+                if (res.voucherType === 'percent') {
+                    voucherDetail = 'Voucher giảm: ' + (parseFloat(res.voucherValue) * 100) + '% (-' + res.discountFormatted + ')<br>';
+                } else {
+                    voucherDetail = 'Voucher giảm: -' + res.discountFormatted + '<br>';
+                }
+                $('#order-summary').html(
+                    '<strong>Tạm tính: </strong>' + res.totalFormatted + '<br>' +
+                    '<span class="text-info">' + voucherDetail + '</span>' +
+                    '<strong>Thành tiền: </strong>' + res.totalAfterDiscountFormatted
+                );
+            } else {
+                $('#voucher-message').html('<span class="text-danger">' + res.message + '</span>');
+            }
+        });
+    });
+</script>
+
+

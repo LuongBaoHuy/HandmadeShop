@@ -1,0 +1,785 @@
+﻿@model HandmadeShop.Models.Product
+@{
+    ViewBag.Title = Model?.Name ?? "Detail";
+    var productAttributes = ViewBag.ProductAttributes as List<HandmadeShop.Models.Attribute>;
+    var attributeOptions = ViewBag.AttributeOptions as Dictionary<int, List<HandmadeShop.Models.AttributeOption>>;
+    var hasVariations = (bool)(ViewBag.HasVariations ?? false);
+    var relatedProducts = ViewBag.RelatedProducts as List<HandmadeShop.Models.Product>;
+}
+
+<div class="body-content outer-top-xs">
+    <div class='container'>
+        <div class='row single-product'>
+            <div class="detail-block">
+                <div class="row wow fadeInUp">
+                    <!-- Hình ảnh sản phẩm -->
+                    <div class="col-xs-12 col-sm-6 col-md-5 gallery-holder">
+                        <div class="product-gallery-shopee">
+                            <div class="main-image">
+                                @{
+                                    var images = Model.ProductImages?.ToList() ?? new List<HandmadeShop.Models.ProductImage>();
+                                    var mainImage = images.FirstOrDefault();
+                                }
+                                <img id="main-product-image" src="@(mainImage?.ImageUrl ?? "/images/no-image.png")" alt="@Model.Name" class="img-responsive" />
+                            </div>
+                            <div class="thumbnail-list">
+                                @foreach (var img in images)
+                                {
+                                    <img src="@img.ImageUrl"
+                                         alt="Ảnh sản phẩm"
+                                         class="thumbnail-image"
+                                         onclick="document.getElementById('main-product-image').src='@img.ImageUrl';" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin sản phẩm -->
+                    <div class='col-sm-6 col-md-7 product-info-block'>
+                        <div class="product-info">
+                            <h1 class="name">@(Model?.Name ?? "Sản phẩm không tồn tại")</h1>
+                            
+                            <!-- Đánh giá và reviews -->
+                            <div class="rating-reviews m-t-20">
+                                <div class="row">
+                                    <div class="col-sm-4">                                            
+                                        <span class="rating-stars rating-stars--sm">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                <i class="fa fa-star@(i <= ViewBag.AvgRating ? "" : "-o")"></i>
+                                            }
+                                        </span>                                            
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="reviews">
+                                            <span>(@ViewBag.TotalReviews đánh giá)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin kho -->
+                            <div class="stock-container info-container m-t-10">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="stock-box">
+                                            <span class="label">Kho:</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="stock-box">
+                                            <span class="value" id="stock-display">@(Model?.Stock ?? 0)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Giá sản phẩm -->
+                            <div class="price-container info-container m-t-20">
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="price-box">
+                                            <span class="price" id="product-price">
+                                                @{
+                                                    decimal price = Model?.Price ?? 0;
+                                                    decimal discountRate = Model?.DiscountedPrice ?? 0;
+                                                    decimal finalPrice = (discountRate > 0) ? price * (1 - discountRate) : price;
+                                                }
+                                                <span>@finalPrice.ToString("N0") VNĐ</span>
+                                                @if (discountRate > 0)
+                                                {
+                                                    <span class="price-strike">@price.ToString("N0") VNĐ</span>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form thêm vào giỏ hàng -->
+                            <div class="quantity-container info-container">
+                                <div class="row">
+                                    <form id="add-to-cart-form">
+                                        <input type="hidden" id="product-id" value="@Model.Id" />
+                                        <input type="hidden" id="selected-variation-id" value="" />
+                                        
+                                        @if (hasVariations && productAttributes != null && productAttributes.Any())
+                                        {
+                                            <!-- Phần chọn phân loại sản phẩm -->
+                                            <div class="col-12">
+                                                <div class="product-variant-select">
+                                                    <h4 class="variant-title">Chọn phân loại sản phẩm</h4>
+                                                    @foreach (var attr in productAttributes)
+                                                    {
+                                                        <div class="variant-attribute-group">
+                                                            <span class="attribute-label">@attr.Name:</span>
+                                                            <div class="attribute-options" data-attribute-id="@attr.Id">
+                                                                @if (attributeOptions.ContainsKey(attr.Id))
+                                                                {
+                                                                    @foreach (var option in attributeOptions[attr.Id])
+                                                                    {
+                                                                        <button type="button" 
+                                                                                class="variant-option" 
+                                                                                data-attribute-id="@attr.Id" 
+                                                                                data-option-value="@option.Value">
+                                                                            @option.Value
+                                                                        </button>
+                                                                    }
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        
+                                        <!-- Phần số lượng -->
+                                        <div class="col-12">
+                                            <div class="quantity-section">
+                                                <div class="quantity-row">
+                                                    <div class="quantity-label-col">
+                                                        <span class="quantity-label">Số lượng:</span>
+                                                    </div>
+                                                    <div class="quantity-input-col">
+                                                        <div class="quantity-controls">                                                                
+                                                            <input type="number" 
+                                                                   id="quantity-input" 
+                                                                   class="quantity-input" 
+                                                                   value="1" 
+                                                                   min="1" 
+                                                                   max="@(Model?.Stock ?? 1)" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="quantity-stock-info">
+                                                        <span class="stock-available">(<span id="available-stock">@(Model?.Stock ?? 0)</span> sản phẩm có sẵn)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Phần nút hành động -->
+                                        <div class="col-12">
+                                            <div class="action-buttons">
+                                                <button type="submit" class="btn btn-add-to-cart" id="add-to-cart-btn">
+                                                    <i class="fa fa-shopping-cart me-2"></i>
+                                                    Thêm vào giỏ
+                                                </button>
+                                                <button type="button" class="btn btn-buy-now" id="buy-now-btn">
+                                                    <i class="fa fa-bolt me-2"></i>
+                                                    Mua ngay
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>                                
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs thông tin chi tiết -->
+            <div class="product-tabs inner-bottom-xs wow fadeInUp">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <ul id="product-tabs" class="nav nav-tabs nav-tab-cell">
+                            <li class="active"><a data-toggle="tab" href="#description" class="fw-bold fs-20">MÔ TẢ</a></li>
+                            <li><a data-toggle="tab" href="#review" class="fw-bold fs-20">ĐÁNH GIÁ</a></li>
+                            <li><a data-toggle="tab" href="#contact" class="fw-bold fs-20">LIÊN HỆ</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="tab-content">
+                            <!-- Tab mô tả -->
+                            <div id="description" class="tab-pane in active">
+                                <div class="product-description-shopee">
+                                    <h4>Chi tiết sản phẩm</h4>
+                                    <table class="table table-bordered product-spec-table">
+                                        <tr>
+                                            <th>Tên sản phẩm</th>
+                                            <td>@(Model?.Name ?? "Không xác định")</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Danh mục</th>
+                                            <td>@(Model?.Category?.CategoriesName ?? "Không xác định")</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Kho hàng</th>   
+                                            <td>@(Model?.Stock ?? 0)</td>
+                                        </tr>
+                                        @if (Model?.OriginalPrice.HasValue == true)
+                                        {
+                                            <tr>
+                                                <th>Giá gốc</th>
+                                                <td>@Model.OriginalPrice.Value.ToString("N0") VNĐ</td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <th>Giá bán</th>
+                                            <td>
+                                                @{
+                                                    decimal detailPrice = Model?.Price ?? 0;
+                                                    decimal detailDiscountRate = Model?.DiscountedPrice ?? 0;
+                                                    decimal detailFinalPrice = (detailDiscountRate > 0) ? detailPrice * (1 - detailDiscountRate) : detailPrice;
+                                                }
+                                                @detailFinalPrice.ToString("N0") VNĐ
+                                                @if (detailDiscountRate > 0)
+                                                {
+                                                    <span class="price-strike">@detailPrice.ToString("N0") VNĐ</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        @if (Model?.DiscountedPrice.HasValue == true && Model.DiscountedPrice > 0)
+                                        {
+                                            <tr>
+                                                <th>Giá khuyến mãi</th>
+                                                <td>@((int)(Model.DiscountedPrice.Value * 100))%</td>
+                                            </tr>
+                                        }
+                                    </table>
+                                    <div class="mt-20">
+                                        <h4>Mô tả sản phẩm</h4>
+                                        <div class="description-content">
+                                            @Html.Raw(Model?.Description ?? "Không có mô tả")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab đánh giá -->
+                            <div id="review" class="tab-pane">
+                                <div class="product-review-shopee">
+                                    <h3>Đánh giá sản phẩm</h3>
+                                    
+                                    <!-- Tổng quan đánh giá -->
+                                    <div class="row review-summary-row">
+                                        <div class="col-md-3 text-center">
+                                            <div class="rating-summary-score">
+                                                @ViewBag.AvgRating
+                                                <div>
+                                                    <span class="rating-stars rating-stars--lg">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fa fa-star@(i <= ViewBag.AvgRating ? "" : "-o")"></i>
+                                                        }
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>@ViewBag.TotalReviews đánh giá</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Danh sách đánh giá -->
+                                    <div class="reviews-list">
+                                        @if (ViewBag.Reviews != null && ((List<HandmadeShop.Models.Review>)ViewBag.Reviews).Any())
+                                        {
+                                            @foreach (var review in (List<HandmadeShop.Models.Review>)ViewBag.Reviews)
+                                            {
+                                                <div class="review-item">
+                                                    <!-- Review của khách hàng -->
+                                                    <div style="display:flex; align-items:start; gap:12px; margin-bottom:10px;">
+                                                        @if (!string.IsNullOrEmpty(review.User?.ProfileImageUrl))
+                                                        {
+                                                            <img src="@review.User.ProfileImageUrl"
+                                                                 alt="avatar" 
+                                                                 class="avatar avatar-40" />
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="avatar-initials avatar-36 bg-accent">
+                                                                @(review.User?.FullName?.Substring(0, 1).ToUpper())
+                                                            </div>
+                                                        }
+                                                        <div style="flex:1;">
+                                                            <div style="font-weight:bold;">@(review.User?.FullName ?? "Người dùng ẩn danh")</div>
+                                                            <div>
+                                                                <span class="rating-stars rating-stars--sm">
+                                                                    @for (int i = 1; i <= 5; i++)
+                                                                    {
+                                                                        <i class="fa fa-star@(i <= review.Rating ? "" : "-o")"></i>
+                                                                    }
+                                                                </span>
+                                                                <span class="text-muted ml-8">@review.CreatedAt?.ToString("dd/MM/yyyy")</span>
+                                                            </div>
+                                                            <div class="mt-5">@review.Comment</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Phản hồi của admin -->
+                                                    @if (review.ReviewReplies != null && review.ReviewReplies.Any())
+                                                    {
+                                                        @foreach (var reply in review.ReviewReplies)
+                                                        {
+                                                            <div class="review-reply">
+                                                                <div style="display:flex; align-items:start; gap:12px;">
+                                                                    <img src="@(string.IsNullOrEmpty(reply.User?.ProfileImageUrl) ? "/uploads/Avartar/Admin/Logo_Admin_Default.png" : reply.User.ProfileImageUrl)"
+                                                                         alt="admin" 
+                                                                         class="avatar avatar-32" />
+                                                                    <div>
+                                                                        <div style="font-weight:500;">
+                                                                            @(reply.User?.FullName ?? "Admin")
+                                                                            <span class="badge badge-admin">Admin</span>
+                                                                        </div>
+                                                                        <div class="chat-time">@reply.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+                                                                        <div class="mt-5">@reply.Reply</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+                                                    
+                                                    <!-- Form trả lời đánh giá (chỉ hiển thị với admin) -->
+                                                    @if (User.IsInRole("Admin"))
+                                                    {
+                                                        <div style="margin-left:52px; margin-top:10px;">
+                                                            <form method="post" action="@Url.Action("AddReviewReply", "Detail")" class="reply-form">
+                                                                <input type="hidden" name="reviewId" value="@review.Id" />
+                                                                <div class="input-group">
+                                                                    <input type="text" name="replyContent" class="form-control" placeholder="Nhập phản hồi..." required />
+                                                                    <span class="input-group-btn">
+                                                                        <button type="submit" class="btn btn-primary btn-orange">
+                                                                            <i class="fa fa-paper-plane"></i> Gửi
+                                                                        </button>
+                                                                    </span>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-center" style="padding:20px;">
+                                                <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <!-- Form gửi đánh giá -->
+                                    @if (User.Identity.IsAuthenticated)
+                                    {
+                                        if (ViewBag.CanReview == true)
+                                        {
+                                            <div class="section-separated">
+                                                <h4>Gửi đánh giá của bạn</h4>
+                                                <form method="post" action="@Url.Action("AddReview", "Detail")" id="review-form">
+                                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                                    <div class="form-group">
+                                                        <label>Chọn số sao:</label>
+                                                        <select name="rating" class="form-control" style="width:120px; display:inline-block;" required>
+                                                            <option value="">Chọn sao</option>
+                                                            @for (int i = 5; i >= 1; i--)
+                                                            {
+                                                                <option value="@i">@i sao</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Nội dung đánh giá:</label>
+                                                        <textarea name="content" class="form-control" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sản phẩm..." required></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-danger btn-orange">
+                                                        <i class="fa fa-star"></i> Gửi đánh giá
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="section-separated text-center">
+                                                <p class="text-danger">Bạn chỉ có thể đánh giá khi đã mua sản phẩm này.</p>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="section-separated text-center">
+                                            <p>
+                                                <a href="@Url.Action("Login", "Account")" class="btn btn-primary">Đăng nhập</a> 
+                                                để có thể gửi đánh giá sản phẩm
+                                            </p>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Tab liên hệ -->
+                            <div id="contact" class="tab-pane">
+                                @if (!User.Identity.IsAuthenticated)
+                                {
+                                    <div class="section-separated text-center">
+                                        <p>
+                                            <a href="@Url.Action("Login", "User")" class="btn btn-primary">Đăng nhập</a>
+                                            để liên hệ với chúng tôi.
+                                        </p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="contact-chat-box">
+                                        <h4>Liên hệ với Admin</h4>
+                                        <div class="chat-messages">
+                                            @{
+                                                // Gom tất cả message (user hỏi và admin trả lời) thành 1 list, rồi sort theo thời gian
+                                                var allMessages = new List<dynamic>();
+                                                if (ViewBag.ContactMessages != null)
+                                                {
+                                                    foreach (var q in (List<HandmadeShop.Models.Question>)ViewBag.ContactMessages)
+                                                    {
+                                                        allMessages.Add(new {
+                                                            IsAdmin = false,
+                                                            Username = q.User?.FullName ?? "Bạn",
+                                                            Avatar = q.User?.ProfileImageUrl,
+                                                            Content = q.Content,
+                                                            CreatedAt = q.CreatedAt
+                                                        });
+                                                        if (q.Answers != null)
+                                                        {
+                                                            foreach (var a in q.Answers)
+                                                            {
+                                                                allMessages.Add(new {
+                                                                    IsAdmin = true,
+                                                                    Username = a.User?.FullName ?? "Admin",
+                                                                    Avatar = string.IsNullOrEmpty(a.User?.ProfileImageUrl) ? "/uploads/Avartar/Admin/Logo_Admin_Default.png" : a.User.ProfileImageUrl,
+                                                                    Content = a.Content,
+                                                                    CreatedAt = a.CreatedAt
+                                                                });
+                                                            }
+                                                        }
+                                                    }
+                                                    allMessages = allMessages.OrderBy(m => m.CreatedAt).ToList();
+                                                }
+                                            }
+                                            @if (allMessages != null && allMessages.Count > 0)
+                                            {
+                                                foreach (var msg in allMessages)
+                                                {
+                                                    if (msg.IsAdmin)
+                                                    {
+                                                        <!-- Admin: căn trái -->
+                                                        <div class="chat-row admin">
+                                                            <img src="@msg.Avatar" alt="admin" class="avatar avatar-32 mr-10" />
+                                                            <div class="chat-bubble admin">
+                                                                <div class="chat-name admin">@msg.Username <span class="badge badge-admin">Admin</span></div>
+                                                                <div class="chat-time">@msg.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+                                                                <div class="mt-4">@msg.Content</div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <!-- User: căn phải -->
+                                                        <div class="chat-row user">
+                                                            <div class="chat-bubble user text-right">
+                                                                <div style="font-weight:500;">@msg.Username</div>
+                                                                <div class="chat-time">@msg.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+                                                                <div class="mt-4">@msg.Content</div>
+                                                            </div>
+                                                            @if (!string.IsNullOrEmpty(msg.Avatar))
+                                                            {
+                                                                <img src="@msg.Avatar" alt="user" class="avatar avatar-32 ml-10" />
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="avatar-initials avatar-36 bg-accent ml-10">
+                                                                    @(msg.Username?.Substring(0, 1).ToUpper())
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <div class="text-center text-muted">Chưa có tin nhắn nào.</div>
+                                            }
+                                        </div>
+                                        <!-- Form gửi tin nhắn -->
+                                        <form method="post" action="@Url.Action("SendContact", "Detail")" class="contact-chat-form" autocomplete="off">
+                                            <input type="hidden" name="productId" value="@Model.Id" />
+                                            <div class="input-group">
+                                                <input type="text" name="content" class="form-control" placeholder="Nhập tin nhắn..." required />
+                                                <span class="input-group-btn">
+                                                    <button type="submit" class="btn btn-primary btn-orange">
+                                                        <i class="fa fa-paper-plane"></i> Gửi
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </form>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    const variationsData = @Html.Raw(ViewBag.VariationsData ?? "[]");
+    const hasVariations = @Html.Raw((ViewBag.HasVariations ?? false).ToString().ToLower());
+    let selectedOptions = {}; // { attributeId : optionValue }
+
+    // ========== EVENT CHỌN / BỎ CHỌN OPTION ==========
+    $(document).on('click', '.variant-option', function() {
+        if ($(this).hasClass('disabled-option')) return;
+
+        const attributeId = $(this).data('attribute-id').toString();
+        const optionValue = $(this).data('option-value');
+
+        // Bỏ chọn nếu đang active
+        if ($(this).hasClass('active')) {
+            $(this).removeClass('active');
+            delete selectedOptions[attributeId];
+            $('#selected-variation-id').val('');
+            resetProductInfo();
+        } else {
+            // Chọn mới
+            $(`.variant-option[data-attribute-id="${attributeId}"]`).removeClass('active');
+            $(this).addClass('active');
+            selectedOptions[attributeId] = optionValue;
+        }
+
+        updateOptionAvailability();
+        checkVariationAvailability();
+    });
+
+    // ========== CẬP NHẬT TRẠNG THÁI ENABLE/DISABLE CHO TỪNG OPTION ==========
+    function updateOptionAvailability() {
+        if (!hasVariations) return;
+
+        $('.variant-attribute-group').each(function() {
+            const group = $(this);
+            const attributeId = group.find('.attribute-options').data('attribute-id').toString();
+
+            group.find('.variant-option').each(function() {
+                const btn = $(this);
+                const optionValue = btn.data('option-value');
+
+                // Nếu đang được chọn tạm thời vẫn để enabled (trừ khi stock = 0 ở mọi variation hợp lệ)
+                const available = isOptionAvailable(attributeId, optionValue);
+
+                if (!available) {
+                    btn.addClass('disabled-option').removeClass('active');
+                    if (selectedOptions[attributeId] === optionValue) {
+                        delete selectedOptions[attributeId];
+                        $('#selected-variation-id').val('');
+                        resetProductInfo();
+                    }
+                } else {
+                    btn.removeClass('disabled-option');
+                }
+            });
+        });
+    }
+
+    // Kiểm tra 1 option có khả dụng (tồn tại variation stock > 0 thỏa các lựa chọn đã chọn + option đang xét)
+    function isOptionAvailable(attributeId, optionValue) {
+        return variationsData.some(v => {
+            if (v.Stock <= 0) return false;
+
+            // Map variation options theo AttributeId
+            const vMap = {};
+            v.Options.forEach(o => vMap[o.AttributeId] = o.OptionValue);
+
+            // Variation phải chứa option candidate
+            if (vMap[attributeId] !== optionValue) return false;
+
+            // Các attribute khác đã chọn phải khớp
+            for (let selAttr in selectedOptions) {
+                if (selAttr === attributeId) continue; // attr hiện tại dùng candidate
+                if (vMap[selAttr] !== selectedOptions[selAttr]) return false;
+            }
+            return true;
+        });
+    }
+
+    // ========== CHECK KHI ĐÃ CHỌN ĐỦ ==========
+    function checkVariationAvailability() {
+        if (!hasVariations) return;
+
+        const totalAttributes = $('.variant-attribute-group').length;
+        const selectedCount = Object.keys(selectedOptions).length;
+
+        if (selectedCount === totalAttributes) {
+            const variation = findExactVariation(selectedOptions);
+            if (variation) {
+                updateProductInfo(variation);
+                $('#selected-variation-id').val(variation.Id);
+                enableAddToCart(variation.Stock > 0);
+            } else {
+                showNoVariationMessage();
+                $('#selected-variation-id').val('');
+                enableAddToCart(false);
+                resetProductInfo(false); // không xóa selected class
+            }
+        } else {
+            // Chưa đủ -> reset về mặc định & disable add-to-cart
+            $('#selected-variation-id').val('');
+            resetProductInfo(false);
+            enableAddToCart(false);
+        }
+    }
+
+    // Tìm variation khớp hoàn toàn selectedOptions
+    function findExactVariation(sel) {
+        return variationsData.find(v => {
+            const vMap = {};
+            v.Options.forEach(o => vMap[o.AttributeId] = o.OptionValue);
+            for (let attrId in sel) {
+                if (vMap[attrId] !== sel[attrId]) return false;
+            }
+            // Phải đủ số attribute
+            return Object.keys(vMap).length === Object.keys(sel).length;
+        });
+    }
+
+    // ========== UI & THÔNG TIN SẢN PHẨM ==========
+    function updateProductInfo(variation) {
+        $('#product-price').html(variation.Price.toLocaleString('vi-VN') + ' VNĐ');
+        $('#stock-display').text(variation.Stock);
+        $('#available-stock').text(variation.Stock);
+        $('#quantity-input').attr('max', variation.Stock);
+        if (variation.Stock === 0) {
+            showOutOfStockMessage();
+        } else {
+            hideMessages();
+        }
+    }
+
+    function resetProductInfo(clearSelections = true) {
+        const originalPrice = @(Model?.DiscountedPrice ?? Model?.Price ?? 0);
+        const originalStock = @(Model?.Stock ?? 0);
+        $('#product-price').html(originalPrice.toLocaleString('vi-VN') + ' VNĐ');
+        $('#stock-display').text(originalStock);
+        $('#available-stock').text(originalStock);
+        $('#quantity-input').attr('max', originalStock);
+        if (clearSelections) {
+            selectedOptions = {};
+            $('.variant-option').removeClass('active');
+        }
+        hideMessages();
+    }
+
+    function enableAddToCart(enable) {
+        $('#add-to-cart-btn, #buy-now-btn').prop('disabled', !enable)
+            .toggleClass('disabled', !enable);
+    }
+
+    // ========== THÔNG BÁO ==========
+    function showNoVariationMessage() { showNotification('Phân loại này hiện không có sẵn', 'error'); }
+    function showOutOfStockMessage() { showNotification('Phân loại này hiện đã hết hàng', 'error'); }
+    function hideMessages() { $('.hs-toast').removeClass('show'); }
+
+    // ========== SUBMIT CART (giữ nguyên) ==========
+    $('#add-to-cart-form').on('submit', function(e) {
+        e.preventDefault();
+        const quantity = parseInt($('#quantity-input').val());
+        if (hasVariations && !$('#selected-variation-id').val()) {
+            showNotification('Vui lòng chọn đầy đủ phân loại sản phẩm!', 'error');
+            return;
+        }
+        if (quantity <= 0) {
+            showNotification('Số lượng phải lớn hơn 0!', 'error');
+            return;
+        }
+        const addToCartBtn = $('#add-to-cart-btn');
+        const originalText = addToCartBtn.html();
+        addToCartBtn.html('<i class="fa fa-spinner fa-spin"></i> Đang thêm...').prop('disabled', true);
+        $.ajax({
+            url: '@Url.Action("AddToCart", "Detail")',
+            type: 'POST',
+            data: {
+                productId: $('#product-id').val(),
+                quantity: quantity,
+                variationId: $('#selected-variation-id').val() || null
+            },
+            success: function(r){
+                if (r.success){
+                    showNotification(r.message,'success');
+                    if (r.cartCount) $('.cart-count').text(r.cartCount);
+                    if (r.requireLogin) setTimeout(()=>location.href='@Url.Action("Login","Account")',1200);
+                } else showNotification(r.message,'error');
+            },
+            error: ()=> showNotification('Có lỗi xảy ra khi thêm vào giỏ hàng!','error'),
+            complete: ()=> { addToCartBtn.html(originalText).prop('disabled', false); }
+        });
+    });
+
+    $('#buy-now-btn').on('click', function() {
+        const quantity = parseInt($('#quantity-input').val());
+        if (hasVariations && !$('#selected-variation-id').val()) {
+            showNotification('Vui lòng chọn đầy đủ phân loại sản phẩm!', 'error');
+            return;
+        }
+        if (quantity <= 0) {
+            showNotification('Số lượng phải lớn hơn 0!', 'error');
+            return;
+        }
+        let url = `/Checkout/CheckoutSingle?productId=${$('#product-id').val()}&quantity=${quantity}`;
+        const variationId = $('#selected-variation-id').val();
+        if (variationId) url += `&variationId=${variationId}`;
+        window.location.href = url;
+    });
+
+    function showNotification(message, type) {
+        $('.hs-toast').remove();
+         const notification = $(`
+            <div class="hs-toast ${type}">
+                 <i class="fa fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                 <span>${message}</span>
+             </div>
+         `);
+         $('body').append(notification);
+         setTimeout(()=>notification.addClass('show'),50);
+         setTimeout(()=>{
+             notification.removeClass('show');
+             setTimeout(()=>notification.remove(),300);
+         },2200);
+    }
+
+    // ========== KHỞI TẠO ==========
+    if (!hasVariations) {
+        enableAddToCart(true);
+    } else {
+        enableAddToCart(false);
+        updateOptionAvailability();
+    }
+});
+</script>
+
+<style>
+    .hs-toast {
+        position: fixed;
+        right: 16px;
+        top: 16px; /* nếu bị che bởi header cố định, tăng lên 64-80px */
+        z-index: 3000;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        color: #fff;
+        font-size: 12px;
+        line-height: 1.25;
+        max-width: 280px;
+        width: auto;
+        box-shadow: 0 6px 20px rgba(0,0,0,.15);
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity .2s ease, transform .2s ease;
+        pointer-events: none;
+    }
+    .hs-toast.show { opacity: 1; transform: translateY(0); }
+    .hs-toast.success { background: #1f7a1f; }
+    .hs-toast.error   { background: #b71c1c; }
+    .hs-toast i { font-size: 13px; }
+</style>
+

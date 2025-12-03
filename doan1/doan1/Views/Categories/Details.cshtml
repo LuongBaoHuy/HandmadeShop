@@ -1,0 +1,635 @@
+@model doan1.Models.Category
+
+@{
+    ViewData["Title"] = "Chi tiết danh mục";
+}
+
+<div class="categories-container">
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="title-icon">
+                    <i class="fas fa-tag"></i>
+                </div>
+                <h1>Chi tiết danh mục</h1>
+                <p>Thông tin đầy đủ về danh mục "@Model.CategoriesName"</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-container">
+        <div class="glass-card info-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-info-circle"></i>
+                    Thông tin danh mục
+                </h3>
+                <div class="category-status">
+                    <span class="category-id-badge">#@Model.Id</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="category-overview">
+                    <div class="category-icon-large">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <div class="category-info">
+                        <h2>@Model.CategoriesName</h2>
+                        <div class="category-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-hashtag"></i>
+                                <span>ID: @Model.Id</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-box"></i>
+                                <span>@(Model.Products?.Count ?? 0) sản phẩm</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card products-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-boxes"></i>
+                    Danh sách sản phẩm
+                </h3>
+                <div class="product-count-badge">
+                    @(Model.Products?.Count ?? 0) sản phẩm
+                </div>
+            </div>
+            <div class="card-body">
+                @if (Model?.Products != null && Model.Products.Any())
+                {
+                    <div class="products-grid">
+                        @foreach (var product in Model.Products)
+                        {
+                            <div class="product-card">
+                                <div class="product-image">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name" />
+                                    }
+                                    else
+                                    {
+                                        <div class="image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="product-info">
+                                    <h4>@product.Name</h4>
+                                    <div class="product-price">
+                                        @if (product.Price.HasValue)
+                                        {
+                                            <span class="price">@product.Price.Value.ToString("C", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="no-price">Chưa có giá</span>
+                                        }
+                                    </div>
+                                    <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="glass-btn-sm info">
+                                        <i class="fas fa-eye"></i>
+                                        Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-box-open"></i>
+                        </div>
+                        <h4>Chưa có sản phẩm nào</h4>
+                        <p>Danh mục này chưa có sản phẩm nào. Hãy thêm sản phẩm để hiển thị ở đây.</p>
+                        <a asp-controller="Products" asp-action="Create" asp-route-categoryId="@Model.Id" class="glass-btn primary">
+                            <i class="fas fa-plus"></i>
+                            <span>Thêm sản phẩm</span>
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="glass-card actions-card">
+            <div class="card-header">
+                <h3>
+                    <i class="fas fa-cogs"></i>
+                    Thao tác
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="action-buttons">
+                    <a asp-action="Index" class="glass-btn secondary large">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Quay lại danh sách</span>
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="glass-btn warning large">
+                        <i class="fas fa-edit"></i>
+                        <span>Chỉnh sửa danh mục</span>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="glass-btn danger large">
+                        <i class="fas fa-trash"></i>
+                        <span>Xóa danh mục</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        /* Import Google Fonts */
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-blue: #0066cc;
+            --secondary-blue: #4da6ff;
+            --light-blue: #e6f3ff;
+            --dark-blue: #004499;
+            --ocean-blue: #1e88e5;
+            --sky-blue: #42a5f5;
+            
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #e9ecef;
+            --dark-gray: #495057;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+            
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --shadow-light: 0 8px 32px rgba(31, 38, 135, 0.1);
+            --shadow-medium: 0 12px 40px rgba(31, 38, 135, 0.15);
+            --shadow-strong: 0 16px 48px rgba(31, 38, 135, 0.2);
+            --shadow-neumorphism: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--ocean-blue) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary-blue) 0%, var(--sky-blue) 100%);
+            --gradient-light: linear-gradient(135deg, var(--light-blue) 0%, var(--white) 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .categories-container {
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 3rem;
+        }
+
+        .header-content {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-primary);
+            opacity: 0.1;
+            border-radius: 30px;
+        }
+
+        .header-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .title-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .title-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .details-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: var(--shadow-neumorphism);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .glass-card .card-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .glass-card .card-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .glass-card .card-header i {
+            color: var(--primary-blue);
+            font-size: 1.3rem;
+        }
+
+        .glass-card .card-body {
+            padding: 2rem;
+        }
+
+        .category-id-badge {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+        }
+
+        .product-count-badge {
+            background: var(--gradient-secondary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-light);
+        }
+
+        .category-overview {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .category-icon-large {
+            width: 120px;
+            height: 120px;
+            background: var(--gradient-primary);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-info h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .category-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-item i {
+            color: var(--primary-blue);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 150px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .product-info h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .product-price {
+            margin-bottom: 1rem;
+        }
+
+        .price {
+            color: var(--success);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .no-price {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 0.8rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-light);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            justify-content: center;
+        }
+
+        .glass-btn.large {
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+        }
+
+        .glass-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-light);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .glass-btn:hover::before {
+            opacity: 1;
+        }
+
+        .glass-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .glass-btn.primary::before {
+            background: var(--gradient-secondary);
+        }
+
+        .glass-btn.secondary {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-secondary);
+        }
+
+        .glass-btn.warning {
+            background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+            color: white;
+        }
+
+        .glass-btn.warning::before {
+            background: linear-gradient(135deg, #fbbf24 0%, var(--warning) 100%);
+        }
+
+        .glass-btn.danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .glass-btn.danger::before {
+            background: linear-gradient(135deg, #f87171 0%, var(--danger) 100%);
+        }
+
+        .glass-btn-sm {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+
+        .glass-btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            text-decoration: none;
+            color: white;
+        }
+
+        .glass-btn-sm.info {
+            background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 102, 204, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: var(--primary-blue);
+            font-size: 3rem;
+        }
+
+        .empty-state h4 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @@media (max-width: 768px) {
+            .categories-container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-content {
+                padding: 2rem;
+            }
+
+            .header-title h1 {
+                font-size: 2rem;
+            }
+
+            .category-overview {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+
+            .category-info h2 {
+                font-size: 2rem;
+            }
+
+            .category-stats {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+}

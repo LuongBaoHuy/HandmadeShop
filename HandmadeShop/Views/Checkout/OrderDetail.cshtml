@@ -1,0 +1,126 @@
+@model HandmadeShop.Models.Order
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var subTotal = Model.OrderItems?.Sum(i => i.Price * i.Quantity) ?? 0m;
+    var discount = Math.Max(0, subTotal - Model.TotalPrice);
+}
+
+@if (TempData["OrderSuccess"] != null)
+{
+    <div class="alert alert-success">@TempData["OrderSuccess"]</div>
+}
+
+<h2>Chi tiết đơn hàng</h2>
+
+<div class="mb-3">
+    <p><strong>Mã đơn hàng:</strong> @Model.Id</p>
+    <p><strong>Ngày đặt:</strong> @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</p>
+    <p><strong>Người nhận:</strong> @Model.ShippingName</p>
+    <p><strong>Số điện thoại:</strong> @Model.ShippingPhone</p>
+    <p><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <p><strong>Ghi chú:</strong> @Model.Description</p>
+    }
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Phân loại</th>
+            <th>Số lượng</th>
+            <th>Giá</th>
+            <th>Thành tiền</th>
+            <th>Thanh toán</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.OrderItems)
+    {
+        string variationText = "Không phân loại";
+        if (item.VariantId.HasValue)
+        {
+            var variation = item.Product?.ProductVariations?.FirstOrDefault(v => v.Id == item.VariantId.Value);
+            if (variation != null && !string.IsNullOrWhiteSpace(variation.CombinationHash))
+                variationText = variation.CombinationHash;
+        }
+        <tr>
+            <td>@item.Product?.Name</td>
+            <td>@variationText</td>
+            <td>@item.Quantity</td>
+            <td>@String.Format("{0:N0}₫", item.Price)</td>
+            <td>@String.Format("{0:N0}₫", item.Price * item.Quantity)</td>
+            <!-- Hiển thị trạng thái thanh toán của đơn -->
+            <td>
+                @if (Model.IsPaid)
+                {
+                    <span class="text-success">Đã thanh toán</span>
+                }
+                else
+                {
+                    <span class="text-danger">Chưa thanh toán</span>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="text-right">
+    <div><strong>Tạm tính:</strong> @String.Format("{0:N0}₫", subTotal)</div>
+    @if (discount > 0)
+    {
+        <div class="text-info">Voucher giảm: -@String.Format("{0:N0}₫", discount)</div>
+    }
+    <div><strong>Thành tiền:</strong> @String.Format("{0:N0}₫", Model.TotalPrice)</div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    <a class="btn btn-secondary" href="@Url.Action("Index", "Home")">Tiếp tục mua sắm</a>
+</div>
+
+<style>
+    body, html {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #f8f9fa;
+    }
+    h2 {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: #222;
+        margin-bottom: 1rem;
+    }
+    p, th, td {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        font-size: 1rem;
+        color: #222;
+    }
+    .order-detail-table {
+        width: 100%;
+        margin-top: 1rem;
+        background: #fff;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .order-detail-table th {
+        background: #f5f5f5;
+        font-weight: 600;
+        text-align: left;
+        padding: 10px;
+    }
+    .order-detail-table td {
+        padding: 10px;
+        vertical-align: middle;
+    }
+    .total-price {
+        text-align: right;
+        font-size: 1.1rem;
+        margin-top: 1rem;
+        color: #1a7f37;
+        font-weight: 600;
+    }
+</style>

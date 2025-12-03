@@ -1,0 +1,529 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="body-content outer-top-xs" id="top-banner-and-menu">
+    <div class="container">
+        <div class="row">
+            <!-- ============================================== SIDEBAR ============================================== -->
+            <div class="col-xs-12 col-sm-12 col-md-3 sidebar">
+
+                <!-- ================================== TOP NAVIGATION ================================== -->
+                <div class="side-menu animate-dropdown outer-bottom-xs">
+                    <div class="category-header">
+                        <div class="head"><i class="icon fa fa-align-justify fa-fw"></i> Danh mục</div>
+                        <button class="toggle-categories" type="button">
+                            <i class="fa fa-chevron-down"></i>
+                        </button>
+                    </div>
+                    <div class="category-list-container">
+                        <ul class="category-list">
+                            @if (ViewBag.Categories != null)
+                            {
+                                foreach (var category in ViewBag.Categories)
+                                {
+                                    <li class="category-item">
+                                        <a href="@Url.Action("Category", "Category", new { id = category.Id })" class="category-link">
+                                            <i class="icon fa fa-folder" aria-hidden="true"></i>
+                                            <span class="category-name">@category.CategoriesName</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+                <!-- ================================== TOP NAVIGATION : END ================================== -->
+                <!-- ============================================== HOT DEALS ============================================== -->
+                <div class="sidebar-widget hot-deals wow fadeInUp outer-bottom-xs">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="section-title m-0">Hot</h3>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary me-1" type="button" data-bs-target="#hotDealsCarousel" data-bs-slide="prev">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-target="#hotDealsCarousel" data-bs-slide="next">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="hotDealsCarousel" class="carousel slide" data-bs-ride="carousel">
+                        
+                        <div class="carousel-inner">
+                            @if (ViewBag.HotDeals != null)
+                            {
+                                int counter = 0;
+                                foreach (var item in ViewBag.HotDeals)
+                                {
+                                    string activeClass = counter == 0 ? "active" : "";
+                                    <div class="carousel-item @activeClass">
+                                        <div class="card h-100">
+                                            <div class="hot-deal-wrapper text-center p-3">
+                                                <img src="@item.ImageUrl" class="d-block w-100" alt="@item.Name" style="max-height: 200px; object-fit: contain;">
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">
+                                                    <a href="@Url.Action("Detail", "Detail", new { id = item.Id })" class="text-decoration-none text-dark">
+                                                        @(item.Name.Length > 30 ? item.Name.Substring(0, 30) + "..." : item.Name)
+                                                    </a>
+                                                </h5>
+                                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                                    <div>
+                                                        <span class="text-danger fw-bold">@String.Format("{0:N0}", item.Price * 0.8m) VNĐ</span>
+                                                        <div class="text-muted text-decoration-line-through small">@String.Format("{0:N0}", item.Price) VNĐ</div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    counter++;
+                                }
+                            }
+                        </div>
+                        <!-- Indicators -->
+                        <div class="carousel-indicators position-static m-0">
+                            @if (ViewBag.HotDeals != null)
+                            {
+                                for (int i = 0; i < ViewBag.HotDeals.Count; i++)
+                                {
+                                    <button type="button" data-bs-target="#hotDealsCarousel" data-bs-slide-to="@i" 
+                                            class="@(i == 0 ? "active" : "") mx-1" 
+                                            aria-current="@(i == 0 ? "true" : "false")" 
+                                            aria-label="Slide @(i + 1)"></button>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================================== HOT DEALS: END ============================================== -->
+                <!-- ============================================== SPECIAL OFFER ============================================== -->
+                <div class="sidebar-widget special-offer-widget wow fadeInUp outer-bottom-xs">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="section-title m-0">Special Offer</h3>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary me-1" type="button" data-bs-target="#specialOfferCarousel" data-bs-slide="prev">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-target="#specialOfferCarousel" data-bs-slide="next">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="specialOfferCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            @if (ViewBag.SpecialOffers != null)
+                            {
+                                int counter = 0;
+                                foreach (var item in ViewBag.SpecialOffers)
+                                {
+                                    string activeClass = counter == 0 ? "active" : "";
+                                    <div class="carousel-item @activeClass">
+                                        <div class="special-offer-item">
+                                            <div class="product">
+                                                <div class="product-micro">
+                                                    <div class="row g-0">
+                                                        <div class="col-5">
+                                                            <div class="product-image">
+                                                                <a href="@Url.Action("Detail", "Detail", new { id = item.Id })">
+                                                                    <img src="@item.ImageUrl" alt="@item.Name" class="img-fluid" />
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-7">
+                                                            <div class="product-info p-3">
+                                                                <h3 class="product-name">
+                                                                    <a href="@Url.Action("Detail", "Detail", new { id = item.Id })">
+                                                                        @(item.Name.Length > 40 ? item.Name.Substring(0, 40) + "..." : item.Name)
+                                                                    </a>
+                                                                </h3>
+                                                                <div class="product-price">
+                                                                    <span class="price">@((item?.Price)?.ToString("N0") ?? "0") VNĐ</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    counter++;
+                                }
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-indicators special-offer-indicators">
+                        @if (ViewBag.SpecialOffers != null)
+                        {
+                            for (int i = 0; i < ViewBag.SpecialOffers.Count; i++)
+                            {
+                                <button type="button" data-bs-target="#specialOfferCarousel" data-bs-slide-to="@i" class="@(i == 0 ? "active" : "")" 
+                                        aria-current="@(i == 0 ? "true" : "false")" 
+                                        aria-label="Slide @(i + 1)">
+                                </button>
+                            }
+                        }
+                    </div>
+                </div>
+                <!-- /.sidebar-widget -->
+                <!-- ============================================== SPECIAL OFFER : END ============================================== -->  
+            </div>
+            <!-- /.sidemenu-holder -->
+            <!-- ============================================== SIDEBAR : END ============================================== -->
+            <!-- ============================================== CONTENT ============================================== -->
+            <div class="col-xs-12 col-sm-12 col-md-9 homebanner-holder">
+                <!-- Thông báo lỗi nếu có -->
+                @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+                {
+                    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+                }
+                <!-- ========================================== SECTION – HERO ========================================= -->
+                <div id="hero" class="mb-4">
+                    <div id="mainBanner" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                        <!-- Indicators -->
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#mainBanner" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                        </div>
+                        
+                        <!-- Slides -->
+                        <div class="carousel-inner rounded-3 overflow-hidden">
+                            <!-- Slide 1 -->
+                            <div class="carousel-item active">
+                                <div class="banner-slide" style="background-image: url('@Url.Content("~/images/sliders/01.jpg")');">
+                                    <div class="container-fluid h-100">
+                                        <div class="caption vertical-center text-start">
+                                            <div class="slider-header fadeInDown-1">Top Brands</div>
+                                            <div class="big-text fadeInDown-1">New Collections</div>
+                                            <div class="excerpt fadeInDown-2 d-none d-md-block">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</div>
+                                            <div class="button-holder fadeInDown-3">
+                                                <a href="@Url.Action("Index", "Home")" class="btn btn-lg btn-uppercase btn-primary shop-now-button">Shop Now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Slide 2 -->
+                            <div class="carousel-item">
+                                <div class="banner-slide" style="background-image: url('@Url.Content("~/images/sliders/02.jpg")');">
+                                    <div class="container-fluid h-100">
+                                        <div class="caption vertical-center text-start">
+                                            <div class="slider-header fadeInDown-1">Spring 2016</div>
+                                            <div class="big-text fadeInDown-1">Women <span class="highlight">Fashion</span></div>
+                                            <div class="excerpt fadeInDown-2 d-none d-md-block">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit</div>
+                                            <div class="button-holder fadeInDown-3">
+                                                <a href="@Url.Action("Index", "Home")" class="btn btn-lg btn-uppercase btn-primary shop-now-button">Shop Now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Controls -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#mainBanner" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#mainBanner" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    </div>
+                </div>                
+                <!-- ========================================== SECTION – HERO : END ========================================== -->
+
+                <!-- ============================================== PRODUCT GRID ============================================== -->
+                <div class="search-result-container">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane active" id="grid-container">
+                            <h3 class="section-title">Tất cả sản phẩm</h3>
+                            <div class="category-product">
+                                <div class="row">
+                                    @if (Model != null && Model.Count > 0)
+                                    {
+                                        int productCount = 0;
+                                        foreach (var product in Model)
+                                        {
+                                            if (productCount >= 6) break; // Giới hạn tối đa 6 sản phẩm
+                                            
+                                            // Xử lý null an toàn
+                                            var discount = product.DiscountedPrice == null ? 0m : Convert.ToDecimal(product.DiscountedPrice);
+                                            var hasDiscount = discount > 0m;
+                                            var priceAfterDiscount = hasDiscount ? product.Price * (1 - discount) : product.Price;
+                                            var percentDiscount = (int)Math.Round(discount * 100, MidpointRounding.AwayFromZero);
+
+                                            double avgRating = 0;
+                                            int reviewCount = 0;
+                                            if (product.Reviews != null)
+                                            {
+                                                double total = 0;
+                                                foreach (var r in product.Reviews)
+                                                {
+                                                    total += (double)r.Rating;
+                                                    reviewCount++;
+                                                }
+                                                avgRating = reviewCount > 0 ? total / reviewCount : 0;
+                                            }
+                                            int fullStars = (int)Math.Floor(avgRating);
+                                            bool hasHalfStar = avgRating - fullStars >= 0.5;
+                                            int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                            
+                                            <div class="col-sm-6 col-md-4 wow fadeInUp" style="padding-bottom: 25px;">
+                                                <div class="products" data-product-id="@product.Id">
+                                                    <div class="product">
+                                                        <div class="product-image">
+                                                            <div class="image">
+                                                                <a href="@Url.Action("Detail", "Detail", new { id = product.Id })">
+                                                                    <img src="@product.ImageUrl" alt="@product.Name" />
+                                                                </a>
+                                                            </div>
+                                                            @if (hasDiscount)
+                                                            {
+                                                                <div class="tag discount">
+                                                                    <span>-@percentDiscount%</span>
+                                                                </div>
+                                                            }
+                                                            else if (product.Stock > 0 && product.Stock <= 10)
+                                                            {
+                                                                <div class="tag new low-stock"><span>low stock</span></div>
+                                                            }
+                                                            else if (product.Stock > 10)
+                                                            {
+                                                                <div class="tag new"><span>new</span></div>
+                                                            }
+                                                        </div>
+                                                        <div class="product-info text-left">
+                                                            <h3 class="name">
+                                                                <a href="@Url.Action("Detail", "Detail", new { id = product.Id })">@product.Name</a>
+                                                            </h3>
+                                                            <div class="rating-container">
+                                                                <div class="rating-stars">
+                                                                    @for (int i = 0; i < fullStars; i++) { <i class="fa fa-star star-filled"></i> }
+                                                                    @if (hasHalfStar) { <i class="fa fa-star-half-o star-half"></i> }
+                                                                    @for (int i = 0; i < emptyStars; i++) { <i class="fa fa-star-o star-empty"></i> }
+                                                                </div>
+                                                                <div class="rating-info">
+                                                                    @if (reviewCount > 0)
+                                                                    {
+                                                                        <span class="rating-score">@avgRating.ToString("F1")</span>
+                                                                        <span class="rating-count">(@reviewCount đánh giá)</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="rating-score">0.0</span>
+                                                                        <span class="rating-count">(Chưa có đánh giá)</span>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div class="description">
+                                                                @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 65)
+                                                                {
+                                                                    @($"{product.Description.Substring(0, 65)}...")
+                                                                }
+                                                                else
+                                                                {
+                                                                    @product.Description
+                                                                }
+                                                            </div>
+                                                            <div class="product-price">
+                                                                <span class="price current-price">@((priceAfterDiscount ?? 0m).ToString("N0")) VNĐ</span>
+                                                                @if (hasDiscount)
+                                                                {
+                                                                    <span class="price original-price">@((product.Price)?.ToString("N0")) VNĐ</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            productCount++;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info">Không tìm thấy sản phẩm nào.</div>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="text-center mt-4">
+                                    <a href="@Url.Action("Category", "Category")" class="btn btn-primary btn-lg">
+                                        <i class="fa fa-eye"></i> Xem tất cả sản phẩm
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================================== PRODUCT GRID : END ============================================== -->                
+                <!-- ============================================== Featured Products ============================================== -->
+                <div class="search-result-container">
+                    <div id="myTabContent" class="tab-content">
+                        <div class="tab-pane active" id="grid-container">
+                            <h3 class="section-title">Sản phẩm nỗi bật</h3>
+                            <div class="category-product">
+                                <div class="row">
+                                    @if (ViewBag.FeaturedProducts != null && ViewBag.FeaturedProducts.Count > 0)
+                                    {
+                                        foreach (var product in ViewBag.FeaturedProducts)
+                                        {
+                                            var discount = product.DiscountedPrice == null ? 0m : Convert.ToDecimal(product.DiscountedPrice);
+                                            var price = product.Price == null ? 0m : Convert.ToDecimal(product.Price);
+                                            var hasDiscount = discount > 0m;
+                                            var priceAfterDiscount = hasDiscount ? price * (1 - discount) : price;
+                                            var percentDiscount = (int)Math.Round(discount * 100, MidpointRounding.AwayFromZero);
+
+                                            double avgRating = 0;
+                                            int reviewCount = 0;
+                                            if (product.Reviews != null)
+                                            {
+                                                double total = 0;
+                                                foreach (var r in product.Reviews)
+                                                {
+                                                    total += (double)r.Rating;
+                                                    reviewCount++;
+                                                }
+                                                avgRating = reviewCount > 0 ? total / reviewCount : 0;
+                                            }
+                                            int fullStars = (int)Math.Floor(avgRating);
+                                            bool hasHalfStar = avgRating - fullStars >= 0.5;
+                                            int emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+                                            <div class="col-sm-6 col-md-4 wow fadeInUp" style="padding-bottom: 25px;">
+                                                <div class="products" data-product-id="@product.Id">
+                                                    <div class="product">
+                                                        <div class="product-image">
+                                                            <div class="image">
+                                                                <a href="@Url.Action("Detail", "Detail", new { id = product.Id })">
+                                                                    <img src="@product.ImageUrl" alt="@product.Name" />
+                                                                </a>
+                                                            </div>
+                                                            @if (hasDiscount)
+                                                            {
+                                                                <div class="tag discount">
+                                                                    <span>
+                                                                        -@percentDiscount%
+                                                                    </span>
+                                                                </div>
+                                                            }
+                                                            else if (product.Stock > 0 && product.Stock <= 10)
+                                                            {
+                                                                <div class="tag new low-stock"><span>low stock</span></div>
+                                                            }
+                                                            else if (product.Stock > 10)
+                                                            {
+                                                                <div class="tag new"><span>new</span></div>
+                                                            }
+                                                        </div>
+                                                        <div class="product-info text-left">
+                                                            <h3 class="name">
+                                                                <a href="@Url.Action("Detail", "Detail", new { id = product.Id })">@product.Name</a>
+                                                            </h3>
+                                                            <div class="rating-container">
+                                                                <div class="rating-stars">
+                                                                    @for (int i = 0; i < fullStars; i++) { <i class="fa fa-star star-filled"></i> }
+                                                                    @if (hasHalfStar) { <i class="fa fa-star-half-o star-half"></i> }
+                                                                    @for (int i = 0; i < emptyStars; i++) { <i class="fa fa-star-o star-empty"></i> }
+                                                                </div>
+                                                                <div class="rating-info">
+                                                                    @if (reviewCount > 0)
+                                                                    {
+                                                                        <span class="rating-score">@avgRating.ToString("F1")</span>
+                                                                        <span class="rating-count">(@reviewCount đánh giá)</span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="rating-score">0.0</span>
+                                                                        <span class="rating-count">(Chưa có đánh giá)</span>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div class="description">
+                                                                @if (!string.IsNullOrEmpty(product.Description) && product.Description.Length > 65)
+                                                                {
+                                                                    @($"{product.Description.Substring(0, 65)}...")
+                                                                }
+                                                                else
+                                                                {
+                                                                    @product.Description
+                                                                }
+                                                            </div>
+                                                            <div class="product-price">
+                                                                <span class="price current-price">@(product.Price?.ToString("N0") ?? "0") VNĐ</span>
+                                                                @if (hasDiscount)
+                                                                {
+                                                                    <span class="price original-price">@(product.OriginalPrice?.ToString("N0")) VNĐ</span>
+                                                                }
+                                                                else if (product.Price < 200000)
+                                                                {
+                                                                    <span class="price-before-discount">@($"{product.Price * 1.25m:N0}") VNĐ</span>
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-12">
+                                            <div class="alert alert-info">Không có sản phẩm nổi bật nào.</div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <!-- Nút xem thêm -->
+                            <div class="text-center mt-4">
+                                <a href="@Url.Action("Category", "Category")" class="btn btn-primary btn-lg">
+                                    <i class="fa fa-eye"></i> Xem tất cả sản phẩm
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================================== Featured Products : END ============================================== -->                
+            </div>
+            <!-- /.homebanner-holder -->
+            <!-- ============================================== CONTENT : END ============================================== -->
+        </div>
+        <!-- /.row -->
+        
+    </div>
+    <!-- /.container -->
+</div>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div style="color:red;">@ViewBag.ErrorMessage</div>
+}
+
+<script>
+    $(document).ready(function () {
+        $('.add-to-cart-btn').on('click', function () {
+            var productId = $(this).data('product-id');
+            var quantity = 1; // Mặc định là 1, có thể mở rộng để nhập số lượng
+            $.ajax({
+                url: '@Url.Action("AddToCart", "Home")',
+                type: 'POST',
+                data: { productId: productId, quantity: quantity },
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('#cartCount').text(response.cartCount); // Cập nhật số lượng (nếu có)
+                        $('#cartTotal').text(response.totalPrice + ' VNĐ'); // Cập nhật tổng tiền (nếu có)
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra khi thêm vào giỏ hàng!');
+                }
+            });
+        });
+    });
+</script>
