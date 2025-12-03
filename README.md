@@ -285,7 +285,7 @@ A full-featured ASP.NET Core MVC e-commerce platform designed for handmade produ
 
 #### Backend
 - **Framework**: ASP.NET Core 6.0 MVC
-- **Language**: C# 10.0
+- **Language**: C# 8.0
 - **ORM**: Entity Framework Core 6.0
   - Code-First approach
   - Migration-based schema management
@@ -293,7 +293,7 @@ A full-featured ASP.NET Core MVC e-commerce platform designed for handmade produ
   - Connection resiliency
 
 #### Database
-- **RDBMS**: Microsoft SQL Server 2019+
+- **RDBMS**: Microsoft SQL Server 2019
 - **Design**: Normalized relational schema
 - **Features**:
   - Foreign key constraints
