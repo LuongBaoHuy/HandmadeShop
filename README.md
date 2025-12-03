@@ -534,7 +534,7 @@ Orders (
 ### Customer Interface
 
 #### Homepage
-![Homepage](wwwroot/images/screenshots/homepage.png)
+![Homepage](HandmadeShop/wwwroot/images/screenshots/homepage.png)
 *Modern and responsive homepage with featured products and categories*
 
 #### Product Listing
