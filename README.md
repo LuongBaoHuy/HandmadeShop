@@ -7,23 +7,16 @@
 
 A full-featured ASP.NET Core MVC e-commerce platform designed for handmade product businesses, featuring comprehensive product management, customer shopping experience, and secure payment integration.
 
-![HandmadeShop Banner](wwwroot/images/banner.png)
+![HandmadeShop Banner](HandmadeShop/wwwroot/images/screenshots/banner.png)
 
 ## 📋 Table of Contents
 
 - [Key Features](#-key-features)
-- [Technical Architecture](#-technical-architecture)
 - [Screenshots](#-screenshots)
 - [Getting Started](#-getting-started)
-- [Database Schema](#-database-schema)
 - [Key Implementations](#-key-implementations)
 - [Security Features](#-security-features)
 - [Performance Optimizations](#-performance-optimizations)
-- [Future Enhancements](#-future-enhancements)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Contact](#-contact)
-
 ## 🌟 Key Features
 
 ### 🛍️ Customer Features (Shopping Platform)
